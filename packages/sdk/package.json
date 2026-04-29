@@ -1,0 +1,35 @@
+{
+  "name": "@agora/sdk",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "lint": "eslint src scripts",
+    "typecheck": "tsc --noEmit",
+    "sync-abis": "tsx scripts/sync-abis.ts"
+  },
+  "dependencies": {
+    "@agora/chains": "workspace:*",
+    "@agora/shared": "workspace:*",
+    "viem": "^2.21.0"
+  },
+  "devDependencies": {
+    "@agora/eslint-config": "workspace:*",
+    "@agora/tsconfig": "workspace:*",
+    "tsup": "^8.0.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.4.0"
+  }
+}

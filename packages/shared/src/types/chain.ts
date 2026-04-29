@@ -1,13 +1,17 @@
-export enum ChainKind {
-  EVM = 'evm',
-  SVM = 'svm',
-}
+export const ChainKind = {
+  EVM: 'evm',
+  SVM: 'svm',
+} as const;
 
-export enum ChainEnvironment {
-  Mainnet = 'mainnet',
-  Testnet = 'testnet',
-  Mock = 'mock',
-}
+export type ChainKind = (typeof ChainKind)[keyof typeof ChainKind];
+
+export const ChainEnvironment = {
+  Mainnet: 'mainnet',
+  Testnet: 'testnet',
+  Mock: 'mock',
+} as const;
+
+export type ChainEnvironment = (typeof ChainEnvironment)[keyof typeof ChainEnvironment];
 
 export interface ChainConfig {
   id: number | string;

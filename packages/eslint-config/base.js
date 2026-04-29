@@ -22,6 +22,8 @@ module.exports = [
     rules: {
       ...tsPlugin.configs.recommended.rules,
       'no-console': ['warn', { allow: ['warn', 'error'] }],
+      'no-redeclare': 'off',
+      '@typescript-eslint/no-redeclare': 'off',
       'no-unused-vars': 'off',
       '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
       '@typescript-eslint/no-explicit-any': 'warn',

@@ -1,14 +1,16 @@
 import type { AgentId, HexAddress, HexString } from './agent.ts';
 
-export enum EscrowState {
-  Created = 0,
-  Funded = 1,
-  Delivered = 2,
-  Verified = 3,
-  Released = 4,
-  Disputed = 5,
-  Refunded = 6,
-}
+export const EscrowState = {
+  Created: 0,
+  Funded: 1,
+  Delivered: 2,
+  Verified: 3,
+  Released: 4,
+  Disputed: 5,
+  Refunded: 6,
+} as const;
+
+export type EscrowState = (typeof EscrowState)[keyof typeof EscrowState];
 
 export interface Escrow {
   id: bigint;

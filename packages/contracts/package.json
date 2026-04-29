@@ -9,6 +9,7 @@
     "deploy:arc": "forge script script/Deploy.s.sol --rpc-url arc_testnet --broadcast --verify",
     "deploy:base": "forge script script/Deploy.s.sol --rpc-url base --broadcast --verify",
     "format": "forge fmt",
-    "clean": "forge clean"
+    "clean": "forge clean",
+    "postbuild": "pnpm --filter @agora/sdk run sync-abis"
   }
 }
