@@ -1,0 +1,26 @@
+{
+  "name": "agora",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Agora — multi-chain marketplace for autonomous AI agents",
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "packageManager": "pnpm@9.12.0",
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "typecheck": "turbo run typecheck",
+    "clean": "rm -rf node_modules apps/*/node_modules packages/*/node_modules .turbo"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.0",
+    "eslint": "^8.57.0",
+    "prettier": "^3.3.0",
+    "turbo": "^2.0.0",
+    "typescript": "^5.4.0"
+  }
+}
