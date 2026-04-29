@@ -1,0 +1,21 @@
+{
+  "name": "@agora/chains",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "lint": "eslint src",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@agora/shared": "workspace:*",
+    "viem": "^2.21.0"
+  },
+  "devDependencies": {
+    "@agora/eslint-config": "workspace:*",
+    "@agora/tsconfig": "workspace:*",
+    "typescript": "^5.4.0"
+  }
+}
