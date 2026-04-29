@@ -1,0 +1,83 @@
+:root {
+  --agora-font-sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --agora-font-mono: "SFMono-Regular", "SF Mono", Consolas, "Liberation Mono", monospace;
+
+  --agora-background: 225 33% 98%;
+  --agora-foreground: 230 22% 9%;
+  --agora-muted: 226 28% 92%;
+  --agora-muted-foreground: 228 10% 42%;
+  --agora-card: 0 0% 100%;
+  --agora-card-foreground: 230 22% 9%;
+  --agora-border: 228 21% 86%;
+  --agora-input: 228 21% 88%;
+  --agora-primary: 244 100% 66%;
+  --agora-primary-foreground: 0 0% 100%;
+  --agora-accent: 205 100% 64%;
+  --agora-accent-foreground: 230 22% 9%;
+  --agora-success: 153 78% 42%;
+  --agora-warning: 38 95% 54%;
+  --agora-danger: 353 86% 62%;
+  --agora-ring: 244 100% 66%;
+
+  --agora-radius-sm: 0.5rem;
+  --agora-radius-md: 0.75rem;
+  --agora-radius-lg: 1rem;
+  --agora-radius-xl: 1.5rem;
+}
+
+.dark,
+[data-theme="dark"] {
+  color-scheme: dark;
+  --agora-background: 225 48% 4%;
+  --agora-foreground: 225 33% 96%;
+  --agora-muted: 225 24% 12%;
+  --agora-muted-foreground: 226 12% 68%;
+  --agora-card: 225 34% 7%;
+  --agora-card-foreground: 225 33% 96%;
+  --agora-border: 226 24% 16%;
+  --agora-input: 226 24% 16%;
+  --agora-primary: 244 100% 70%;
+  --agora-primary-foreground: 225 48% 4%;
+  --agora-accent: 207 100% 67%;
+  --agora-accent-foreground: 225 48% 4%;
+  --agora-success: 153 75% 48%;
+  --agora-warning: 38 95% 58%;
+  --agora-danger: 353 86% 66%;
+  --agora-ring: 244 100% 70%;
+}
+
+* {
+  border-color: hsl(var(--agora-border));
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: hsl(var(--agora-background));
+  color: hsl(var(--agora-foreground));
+  font-family: var(--agora-font-sans);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+.agora-app-shell {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 20% 0%, hsl(var(--agora-primary) / 0.2), transparent 30rem),
+    radial-gradient(circle at 80% 20%, hsl(var(--agora-accent) / 0.16), transparent 28rem),
+    hsl(var(--agora-background));
+}
+
+.agora-glass-panel {
+  border: 1px solid hsl(var(--agora-border) / 0.8);
+  background: hsl(var(--agora-card) / 0.78);
+  box-shadow: 0 24px 80px rgb(0 0 0 / 0.32);
+  backdrop-filter: blur(20px);
+}
+
+.agora-focus-ring:focus-visible {
+  outline: 2px solid hsl(var(--agora-ring));
+  outline-offset: 2px;
+}

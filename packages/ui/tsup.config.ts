@@ -1,0 +1,15 @@
+import { defineConfig } from 'tsup';
+
+export default defineConfig({
+  entry: ['src/index.ts'],
+  format: ['cjs', 'esm'],
+  dts: true,
+  sourcemap: true,
+  clean: true,
+  treeshake: true,
+  external: ['react', 'react-dom'],
+  loader: { '.css': 'copy' },
+  outExtension({ format }) {
+    return { js: format === 'esm' ? '.mjs' : '.js' };
+  },
+});

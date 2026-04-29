@@ -1,0 +1,11 @@
+{
+  "extends": "@agora/tsconfig/nextjs.json",
+  "compilerOptions": {
+    "declaration": true,
+    "outDir": "./dist",
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "incremental": false
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx", "tailwind.config.ts", "tsup.config.ts"]
+}
