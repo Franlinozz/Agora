@@ -15,7 +15,10 @@
     "./styles.css": "./src/theme/global.css",
     "./tailwind": "./tailwind.config.ts"
   },
-  "files": ["dist", "src/theme"],
+  "files": [
+    "dist",
+    "src/theme"
+  ],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
@@ -31,7 +34,13 @@
     "@radix-ui/react-tooltip": "^1.1.0",
     "clsx": "^2.1.0",
     "lucide-react": "^0.400.0",
-    "tailwind-merge": "^2.3.0"
+    "tailwind-merge": "^2.3.0",
+    "@rainbow-me/rainbowkit": "^2.1.0",
+    "@tanstack/react-query": "^5.50.0",
+    "wagmi": "^2.12.0",
+    "viem": "^2.21.0",
+    "@agora/chains": "workspace:*",
+    "@agora/sdk": "workspace:*"
   },
   "peerDependencies": {
     "react": "^18.0.0",

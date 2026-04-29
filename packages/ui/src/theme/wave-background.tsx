@@ -1,53 +1,68 @@
-import type { SVGProps } from 'react';
+import React from 'react';
 
-export interface WaveBackgroundProps extends SVGProps<SVGSVGElement> {
-  intensity?: 'subtle' | 'medium';
-}
-
-export function WaveBackground({ intensity = 'subtle', ...props }: WaveBackgroundProps) {
-  const opacity = intensity === 'medium' ? 0.22 : 0.12;
-
+/**
+ * Subtle wavy background. Place once near the root of the app layout.
+ * Renders fixed-position behind all content at very low opacity.
+ * Pure inline SVG, no images, no extra requests.
+ */
+export function WaveBackground({ opacity = 0.05 }: { opacity?: number }) {
   return (
-    <svg
-      aria-hidden="true"
-      viewBox="0 0 1440 720"
-      preserveAspectRatio="none"
-      {...props}
+    <div
+      aria-hidden
       style={{
-        position: 'absolute',
+        position: 'fixed',
         inset: 0,
-        width: '100%',
-        height: '100%',
+        zIndex: -1,
         pointerEvents: 'none',
         opacity,
-        ...(props.style ?? {}),
+        background: 'var(--color-bg-0)',
       }}
     >
-      <defs>
-        <linearGradient id="agora-wave" x1="0" x2="1" y1="0" y2="1">
-          <stop offset="0%" stopColor="hsl(var(--agora-primary))" />
-          <stop offset="55%" stopColor="hsl(var(--agora-accent))" />
-          <stop offset="100%" stopColor="transparent" />
-        </linearGradient>
-      </defs>
-      <path
-        d="M-80 446C156 326 311 598 548 456c179-107 282-288 491-183 145 73 263 66 481-42"
-        fill="none"
-        stroke="url(#agora-wave)"
-        strokeWidth="2"
-      />
-      <path
-        d="M-93 532c265-154 458 133 702-37 171-119 244-248 444-166 172 70 276 117 474-38"
-        fill="none"
-        stroke="url(#agora-wave)"
-        strokeWidth="1"
-      />
-      <path
-        d="M-78 619c260-111 415 83 654-31 239-113 278-255 512-153 160 69 259 83 441-33"
-        fill="none"
-        stroke="url(#agora-wave)"
-        strokeWidth="1"
-      />
-    </svg>
+      <svg
+        width="100%"
+        height="100%"
+        viewBox="0 0 1440 900"
+        preserveAspectRatio="xMidYMid slice"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <defs>
+          <linearGradient id="wave-grad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stopColor="var(--color-arc-purple)" stopOpacity="0.6" />
+            <stop offset="50%" stopColor="var(--color-info)" stopOpacity="0.8" />
+            <stop offset="100%" stopColor="var(--color-arc-purple-light)" stopOpacity="0.6" />
+          </linearGradient>
+        </defs>
+        <path
+          d="M0,450 C240,380 480,520 720,450 C960,380 1200,520 1440,450 L1440,900 L0,900 Z"
+          fill="url(#wave-grad)"
+          opacity="0.4"
+        />
+        <path
+          d="M0,500 C240,430 480,570 720,500 C960,430 1200,570 1440,500 L1440,900 L0,900 Z"
+          fill="url(#wave-grad)"
+          opacity="0.3"
+        />
+        <path
+          d="M0,550 C240,480 480,620 720,550 C960,480 1200,620 1440,550 L1440,900 L0,900 Z"
+          fill="url(#wave-grad)"
+          opacity="0.2"
+        />
+        {Array.from({ length: 80 }).map((_, i) => {
+          const x = (i * 17.3) % 1440;
+          const y = 350 + ((i * 23.7) % 500);
+          const r = 0.5 + ((i * 7) % 8) / 10;
+          return (
+            <circle
+              key={i}
+              cx={x}
+              cy={y}
+              r={r}
+              fill="var(--color-info)"
+              opacity={0.3 + (i % 5) * 0.1}
+            />
+          );
+        })}
+      </svg>
+    </div>
   );
 }
