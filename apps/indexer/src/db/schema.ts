@@ -136,3 +136,68 @@ export const llmSpend = pgTable('llm_spend', {
   callsMade: integer('calls_made').default(0).notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
+
+export const agentTasks = pgTable(
+  'agent_tasks',
+  {
+    pk: serial('pk').primaryKey(),
+    agentPk: integer('agent_pk')
+      .notNull()
+      .references(() => agents.pk),
+    escrowPk: integer('escrow_pk')
+      .notNull()
+      .references(() => escrows.pk),
+    status: text('status').default('pending').notNull(),
+    inputPayload: jsonb('input_payload').notNull(),
+    outputPayload: jsonb('output_payload'),
+    error: text('error'),
+    attempts: integer('attempts').default(0).notNull(),
+    workerId: text('worker_id'),
+    claimedAt: timestamp('claimed_at'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  },
+  (t) => ({
+    statusIdx: index('agent_tasks_status_idx').on(t.status),
+    agentIdx: index('agent_tasks_agent_idx').on(t.agentPk),
+    escrowIdx: index('agent_tasks_escrow_idx').on(t.escrowPk),
+  }),
+);
+
+export const agentCredentials = pgTable(
+  'agent_credentials',
+  {
+    pk: serial('pk').primaryKey(),
+    agentPk: integer('agent_pk')
+      .notNull()
+      .references(() => agents.pk),
+    provider: text('provider').notNull(),
+    encryptedApiKey: text('encrypted_api_key').notNull(),
+    encryptedEndpointUrl: text('encrypted_endpoint_url'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  },
+  (t) => ({
+    agentIdx: uniqueIndex('agent_credentials_agent_idx').on(t.agentPk),
+  }),
+);
+
+export const mediationQueue = pgTable(
+  'mediation_queue',
+  {
+    pk: serial('pk').primaryKey(),
+    escrowPk: integer('escrow_pk')
+      .notNull()
+      .references(() => escrows.pk),
+    deliveryPayload: jsonb('delivery_payload').notNull(),
+    status: text('status').default('pending').notNull(),
+    attempts: integer('attempts').default(0).notNull(),
+    error: text('error'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  },
+  (t) => ({
+    statusIdx: index('mediation_queue_status_idx').on(t.status),
+    escrowIdx: index('mediation_queue_escrow_idx').on(t.escrowPk),
+  }),
+);

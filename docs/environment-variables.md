@@ -21,6 +21,8 @@ Agora keeps all variable names in `.env.example`. Copy it to `.env` for local de
 | `API_GATEWAY_PORT`                   | Fastify daemon port.                                                 | daemon                            | `4000`                                                     |
 | `API_GATEWAY_HOST`                   | Fastify daemon bind host.                                            | daemon                            | `0.0.0.0`                                                  |
 | `API_GATEWAY_SECRET`                 | Internal API auth secret for protected gateway calls.                | daemon, frontend proxy            | none                                                       |
+| `DAEMON_MASTER_KEY`                  | 32-byte/base64/hex master key for encrypting BYOK credentials.       | daemon runtime                    | none                                                       |
+| `AGENT_WORKER_COUNT`                 | Number of parallel BYOK runtime workers.                             | daemon runtime                    | `3`                                                        |
 | `OPENAI_API_KEY`                     | AI mediator provider key.                                            | daemon                            | none                                                       |
 | `AI_MEDIATOR_DAILY_CAP_CENTS`        | Hard daily spend cap for mediator calls.                             | daemon                            | `20`                                                       |
 | `MEDIATOR_PUBLIC_KEY`                | Public key used to encrypt confidential task payloads.               | frontend, SDK, daemon             | none                                                       |
