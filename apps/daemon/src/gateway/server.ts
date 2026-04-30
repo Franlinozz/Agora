@@ -3,6 +3,8 @@ import helmet from '@fastify/helmet';
 import rateLimit from '@fastify/rate-limit';
 import Fastify from 'fastify';
 
+import { loggerOptions } from '../lib/logger.ts';
+
 import { authMiddleware } from './middleware/auth.ts';
 import { registerRouteRateLimits } from './middleware/rate-limit.ts';
 import agentsRoutes from './routes/agents.ts';
@@ -10,23 +12,13 @@ import chatRoutes from './routes/chat.ts';
 import contactRoutes from './routes/contact.ts';
 import escrowsRoutes from './routes/escrows.ts';
 import eventsRoutes from './routes/events.ts';
+import healthRoutes from './routes/health.ts';
 import leaderboardRoutes from './routes/leaderboard.ts';
 import statsRoutes from './routes/stats.ts';
 import subscribeRoutes from './routes/subscribe.ts';
 
 export async function buildServer() {
-  const app = Fastify({
-    logger:
-      process.env.NODE_ENV === 'production'
-        ? { level: process.env.LOG_LEVEL ?? 'info' }
-        : {
-            level: process.env.LOG_LEVEL ?? 'info',
-            transport: {
-              target: 'pino-pretty',
-              options: { colorize: true, translateTime: 'SYS:standard' },
-            },
-          },
-  });
+  const app = Fastify({ logger: loggerOptions });
 
   await app.register(helmet);
   await app.register(cors, {
@@ -35,9 +27,14 @@ export async function buildServer() {
   await app.register(rateLimit, { max: 100, timeWindow: '1 minute' });
   await registerRouteRateLimits(app);
 
-  app.addHook('onRequest', authMiddleware);
-  app.get('/health', async () => ({ ok: true }));
+  app.setErrorHandler((error, request, reply) => {
+    request.log.error({ error }, 'Gateway request failed');
+    void reply.code(error.statusCode ?? 500).send({ error: error.message || 'Internal error' });
+  });
 
+  app.addHook('onRequest', authMiddleware);
+
+  await app.register(healthRoutes);
   await app.register(statsRoutes, { prefix: '/stats' });
   await app.register(agentsRoutes, { prefix: '/agents' });
   await app.register(escrowsRoutes, { prefix: '/escrows' });

@@ -4,6 +4,7 @@ import type { FastifyInstance } from 'fastify';
 
 import { db } from '../../db/client.ts';
 import { agents, escrows } from '../../db/schema.ts';
+import { currentSpend } from '../../mediator/spend.ts';
 
 export default async function statsRoutes(app: FastifyInstance): Promise<void> {
   app.get('/', async () => {
@@ -26,6 +27,14 @@ export default async function statsRoutes(app: FastifyInstance): Promise<void> {
       totalEscrows: completedEscrows?.count ?? 0,
       totalSettledUsdc: totalSettled?.sum?.toString() ?? '0',
       activeAgentsWeek: activeWeek?.count ?? 0,
+    };
+  });
+
+  app.get('/llm-spend', async () => {
+    const spend = await currentSpend();
+    return {
+      ...spend,
+      remainingCents: Math.max(0, spend.capCents - spend.centsSpent),
     };
   });
 }

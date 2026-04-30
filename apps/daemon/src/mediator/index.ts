@@ -13,18 +13,21 @@ import {
 const MAX_ATTEMPTS = 3;
 
 let controller: AbortController | null = null;
+let workers: Array<Promise<void>> = [];
 
 export function startMediator(): void {
   if (controller) return;
 
   controller = new AbortController();
+  workers = [];
   const workerCount = Number(process.env.MEDIATOR_WORKER_COUNT ?? 1);
 
   for (let index = 0; index < workerCount; index += 1) {
     const workerId = `mediator-worker-${index + 1}`;
-    void mediatorLoop(workerId, controller.signal).catch((error: unknown) => {
+    const worker = mediatorLoop(workerId, controller.signal).catch((error: unknown) => {
       logger.error({ workerId, error }, 'Mediator worker crashed');
     });
+    workers.push(worker);
   }
 
   logger.info(
@@ -33,9 +36,14 @@ export function startMediator(): void {
   );
 }
 
-export function stopMediator(): void {
-  controller?.abort();
+export async function stopMediator(): Promise<void> {
+  if (!controller) return;
+
+  controller.abort();
+  await Promise.allSettled(workers);
+  workers = [];
   controller = null;
+  logger.info('AI mediator worker pool stopped');
 }
 
 async function mediatorLoop(workerId: string, signal?: AbortSignal): Promise<void> {

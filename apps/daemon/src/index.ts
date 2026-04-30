@@ -1,5 +1,6 @@
 import { buildServer } from './gateway/server.ts';
 import { logger } from './lib/logger.ts';
+import { registerShutdownHandlers } from './lib/shutdown.ts';
 import { startMediator } from './mediator/index.ts';
 import { startAgentRuntime } from './runtime/index.ts';
 
@@ -12,6 +13,7 @@ async function main(): Promise<void> {
 
   startAgentRuntime();
   startMediator();
+  registerShutdownHandlers({ app });
   logger.info('Daemon up. Gateway, runtime, mediator running.');
 }
 

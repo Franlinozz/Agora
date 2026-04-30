@@ -1,6 +1,6 @@
 import pino from 'pino';
 
-export const logger = pino({
+export const loggerOptions = {
   level: process.env.LOG_LEVEL ?? 'info',
   transport:
     process.env.NODE_ENV === 'production'
@@ -12,4 +12,6 @@ export const logger = pino({
             translateTime: 'SYS:standard',
           },
         },
-});
+};
+
+export const logger = pino(loggerOptions);
