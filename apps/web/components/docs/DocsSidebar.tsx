@@ -1,0 +1,4 @@
+import Link from 'next/link';
+import { cn } from '@agora/ui';
+import type { Doc } from '@/lib/docs';
+export function DocsSidebar({ docs, active }: { docs: Doc[]; active: string }) { const groups = docs.reduce<Record<string, Doc[]>>((acc, doc) => { (acc[doc.category] ||= []).push(doc); return acc; }, {}); return <aside className="sticky top-24 space-y-6">{Object.entries(groups).map(([category, items]) => <div key={category}><h3 className="mb-2 font-mono text-xs uppercase tracking-[0.2em] text-[var(--color-text-tertiary)]">{category}</h3><div className="grid gap-1">{items.map((doc) => <Link key={doc.slug} href={`/docs/${doc.slug}`} className={cn('rounded-md px-3 py-2 text-sm no-underline', active === doc.slug ? 'bg-[var(--color-bg-2)] text-[var(--color-text-primary)]' : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-1)]')}>{doc.title}</Link>)}</div></div>)}</aside>; }
