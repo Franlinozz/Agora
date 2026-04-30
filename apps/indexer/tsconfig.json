@@ -1,0 +1,10 @@
+{
+  "extends": "@agora/tsconfig/node.json",
+  "compilerOptions": {
+    "declaration": true,
+    "outDir": "./dist",
+    "noEmit": true,
+    "allowImportingTsExtensions": true
+  },
+  "include": ["src/**/*.ts", "drizzle.config.ts"]
+}
