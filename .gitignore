@@ -16,3 +16,5 @@ broadcast/
 cache/
 forge-cache/
 .pnpm-store/
+
+*.tsbuildinfo

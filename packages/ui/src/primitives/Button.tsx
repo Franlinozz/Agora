@@ -39,7 +39,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         disabled={disabled || loading}
         {...props}
       >
-        {loading ? <span className="size-4 animate-spin rounded-full border-2 border-current border-t-transparent" /> : null}
+        {!asChild && loading ? <span className="size-4 animate-spin rounded-full border-2 border-current border-t-transparent" /> : null}
         {children}
       </Comp>
     );

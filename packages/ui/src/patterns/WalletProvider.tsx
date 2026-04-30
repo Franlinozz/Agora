@@ -45,7 +45,7 @@ export function WalletProvider({ children, walletConnectProjectId }: { children:
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
         <RainbowKitProvider theme={darkTheme({ accentColor: '#5C5BD6', accentColorForeground: 'white', borderRadius: 'medium', fontStack: 'system' })}>
-          {children}
+          <>{children}</>
         </RainbowKitProvider>
       </QueryClientProvider>
     </WagmiProvider>
