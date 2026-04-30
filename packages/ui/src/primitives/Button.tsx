@@ -26,23 +26,27 @@ const sizes = {
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ asChild, loading, variant = 'primary', size = 'md', className, disabled, children, ...props }, ref) => {
-    const Comp = asChild ? Slot : 'button';
-    return (
-      <Comp
-        ref={ref}
-        className={cn(
-          'inline-flex items-center justify-center gap-2 rounded-md font-medium transition duration-200 ease-agora focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-arc-purple)] disabled:pointer-events-none disabled:opacity-50',
-          variants[variant],
-          sizes[size],
-          className,
-        )}
-        disabled={disabled || loading}
-        {...props}
-      >
-        {!asChild && loading ? <span className="size-4 animate-spin rounded-full border-2 border-current border-t-transparent" /> : null}
-        {children}
-      </Comp>
+    const classes = cn(
+      'inline-flex items-center justify-center gap-2 rounded-md font-medium transition duration-200 ease-agora focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-arc-purple)] disabled:pointer-events-none disabled:opacity-50',
+      variants[variant],
+      sizes[size],
+      className,
     );
-  },
+
+    if (asChild) {
+      return (
+        <Slot ref={ref} className={classes} {...props}>
+          {children}
+        </Slot>
+      );
+    }
+
+    return (
+      <button ref={ref} className={classes} disabled={disabled || loading} {...props}>
+        {loading ? <span className="size-4 animate-spin rounded-full border-2 border-current border-t-transparent" /> : null}
+        {children}
+      </button>
+    );
+  }, 
 );
 Button.displayName = 'Button';
