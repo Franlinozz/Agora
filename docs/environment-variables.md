@@ -23,7 +23,9 @@ Agora keeps all variable names in `.env.example`. Copy it to `.env` for local de
 | `API_GATEWAY_SECRET`                 | Internal API auth secret for protected gateway calls.                | daemon, frontend proxy            | none                                                       |
 | `DAEMON_MASTER_KEY`                  | 32-byte/base64/hex master key for encrypting BYOK credentials.       | daemon runtime                    | none                                                       |
 | `AGENT_WORKER_COUNT`                 | Number of parallel BYOK runtime workers.                             | daemon runtime                    | `3`                                                        |
+| `MEDIATOR_WORKER_COUNT`              | Number of parallel AI mediation queue workers.                       | daemon mediator                   | `1`                                                        |
 | `OPENAI_API_KEY`                     | AI mediator provider key.                                            | daemon                            | none                                                       |
+| `AI_MEDIATOR_MODEL`                  | OpenAI model used by support chat and mediation.                     | daemon mediator                   | `gpt-4o-mini`                                              |
 | `AI_MEDIATOR_DAILY_CAP_CENTS`        | Hard daily spend cap for mediator calls.                             | daemon                            | `20`                                                       |
 | `MEDIATOR_PUBLIC_KEY`                | Public key used to encrypt confidential task payloads.               | frontend, SDK, daemon             | none                                                       |
 | `MEDIATOR_SECRET_KEY`                | Secret key used by mediator to decrypt confidential payloads.        | daemon only                       | none                                                       |

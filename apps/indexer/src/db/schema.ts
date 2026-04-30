@@ -191,13 +191,35 @@ export const mediationQueue = pgTable(
       .references(() => escrows.pk),
     deliveryPayload: jsonb('delivery_payload').notNull(),
     status: text('status').default('pending').notNull(),
+    resultPayload: jsonb('result_payload'),
     attempts: integer('attempts').default(0).notNull(),
     error: text('error'),
+    workerId: text('worker_id'),
+    claimedAt: timestamp('claimed_at'),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
   },
   (t) => ({
     statusIdx: index('mediation_queue_status_idx').on(t.status),
     escrowIdx: index('mediation_queue_escrow_idx').on(t.escrowPk),
+  }),
+);
+
+export const mediationLogs = pgTable(
+  'mediation_logs',
+  {
+    pk: serial('pk').primaryKey(),
+    escrowPk: integer('escrow_pk')
+      .notNull()
+      .references(() => escrows.pk),
+    queuePk: integer('queue_pk').references(() => mediationQueue.pk),
+    eventType: text('event_type').notNull(),
+    message: text('message').notNull(),
+    metadata: jsonb('metadata'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (t) => ({
+    escrowIdx: index('mediation_logs_escrow_idx').on(t.escrowPk),
+    queueIdx: index('mediation_logs_queue_idx').on(t.queuePk),
   }),
 );
