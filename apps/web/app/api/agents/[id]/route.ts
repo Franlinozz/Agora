@@ -1,5 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
-
-export async function GET(_req: NextRequest, { params }: { params: { id: string } }) {
-  return NextResponse.json({ agent: null, id: params.id });
-}
+import { NextRequest } from 'next/server';
+import { proxyToVM } from '@/lib/api/proxy';
+export const runtime = 'edge';
+export async function GET(req: NextRequest, { params }: { params: { id: string } }) { return proxyToVM(req, `/agents/${encodeURIComponent(params.id)}`); }

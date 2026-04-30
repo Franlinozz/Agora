@@ -1,3 +1,4 @@
-import { NextResponse } from 'next/server';
-export const revalidate = 300;
-export async function GET() { return NextResponse.json({ agents: [], deployers: [], tasks: [] }); }
+import { NextRequest } from 'next/server';
+import { proxyToVM } from '@/lib/api/proxy';
+export const runtime = 'edge';
+export async function GET(req: NextRequest) { return proxyToVM(req, '/leaderboard'); }
