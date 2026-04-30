@@ -1,0 +1,35 @@
+# Dependencies and build caches
+node_modules
+.next/cache
+.turbo
+.pnpm-store
+
+# Local env and logs
+.env
+.env.local
+.env.*.local
+*.log
+
+# Tests and coverage
+coverage
+test-results
+**/*.test.ts
+**/*.test.tsx
+**/*.spec.ts
+**/*.spec.tsx
+
+# Source maps / debug output
+*.map
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Contract build artifacts are large and not needed by the frontend deploy
+../../packages/contracts/out
+../../packages/contracts/cache
+../../packages/contracts/broadcast
+../../packages/contracts/lib
+
+# Misc
+.DS_Store
