@@ -17,7 +17,9 @@ export const ACTIVE_CHAINS: ReadonlyArray<ChainConfig> = ALL_CHAINS.filter(
 );
 
 export function getChain(id: number | string): ChainConfig | undefined {
-  return ALL_CHAINS.find((chain) => chain.id === id);
+  return ALL_CHAINS.find(
+    (chain) => chain.id === id || chain.name === id || String(chain.id) === String(id),
+  );
 }
 
 export function getChainOrThrow(id: number | string): ChainConfig {
