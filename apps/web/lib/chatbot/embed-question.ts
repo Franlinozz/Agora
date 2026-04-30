@@ -1,0 +1,2 @@
+export function embedQuestion(question: string) { const vector = Array.from({ length: 16 }, (_, i) => 0); for (const [i, char] of Array.from(question).entries()) vector[i % vector.length] = (vector[i % vector.length] ?? 0) + char.charCodeAt(0) / 255; return vector; }
+export function cosine(a: number[], b: number[]) { const dot=a.reduce((sum,v,i)=>sum+v*(b[i]||0),0); const na=Math.sqrt(a.reduce((s,v)=>s+v*v,0)); const nb=Math.sqrt(b.reduce((s,v)=>s+v*v,0)); return dot/(na*nb||1); }
