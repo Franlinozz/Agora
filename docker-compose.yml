@@ -1,0 +1,87 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: agora
+      POSTGRES_USER: agora
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - '127.0.0.1:5432:5432'
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U agora -d agora']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '0.5'
+
+  indexer:
+    build:
+      context: .
+      dockerfile: apps/indexer/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgres://agora:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}@postgres:5432/agora
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+
+  daemon:
+    build:
+      context: .
+      dockerfile: apps/daemon/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgres://agora:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}@postgres:5432/agora
+      API_GATEWAY_HOST: 0.0.0.0
+      API_GATEWAY_PORT: 4000
+    ports:
+      - '127.0.0.1:4000:4000'
+    healthcheck:
+      test: ['CMD', 'wget', '-q', '-O-', 'http://localhost:4000/health']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '0.7'
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN:?CLOUDFLARE_TUNNEL_TOKEN is required}
+    depends_on:
+      daemon:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.2'
+
+volumes:
+  postgres_data:
+
+networks:
+  default:
+    name: agora-net

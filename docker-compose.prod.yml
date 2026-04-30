@@ -1,0 +1,46 @@
+services:
+  postgres:
+    logging: &default-logging
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '3'
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+
+  indexer:
+    logging: *default-logging
+    environment:
+      NODE_ENV: production
+      SENTRY_DSN: ${SENTRY_DSN:-}
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 5
+        window: 120s
+
+  daemon:
+    logging: *default-logging
+    environment:
+      NODE_ENV: production
+      SENTRY_DSN: ${SENTRY_DSN:-}
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 5
+        window: 120s
+
+  cloudflared:
+    logging: *default-logging
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 5
+        window: 120s
