@@ -6,6 +6,7 @@ import { db } from '../db/client.ts';
 import { chains } from '../db/schema.ts';
 
 import { logger } from './logger.ts';
+import { withRpcBackoff } from './rpc-backoff.ts';
 
 const DEFAULT_CHUNK_SIZE = 100n;
 
@@ -26,7 +27,9 @@ export async function backfill(
 ): Promise<void> {
   const chain = getChainOrThrow(chainId);
   const chunkSize = options.chunkSize ?? DEFAULT_CHUNK_SIZE;
-  const currentHead = await client.getBlockNumber();
+  const currentHead = await withRpcBackoff(`${chainId}:getBlockNumber`, () =>
+    client.getBlockNumber(),
+  );
   const lastIndexedBlock = await ensureChainRow(chainId);
   const startBlock = lastIndexedBlock + 1n;
 
@@ -42,7 +45,9 @@ export async function backfill(
 
   for (let fromBlock = startBlock; fromBlock <= currentHead; fromBlock += chunkSize) {
     const toBlock = minBigInt(fromBlock + chunkSize - 1n, currentHead);
-    const logs = await client.getContractEvents({ address, abi, fromBlock, toBlock });
+    const logs = await withRpcBackoff(`${chainId}:getContractEvents`, () =>
+      client.getContractEvents({ address, abi, fromBlock, toBlock }),
+    );
 
     for (const log of logs) {
       await onLog(chainId, log as BackfillLog);

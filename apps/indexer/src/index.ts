@@ -1,12 +1,13 @@
 import { closeDb } from './db/client.ts';
 import { runMigrations } from './db/migrate.ts';
 import { startArcIndexer } from './handlers/arc.ts';
+import { startBaseIndexer } from './handlers/base.ts';
 import { logger } from './lib/logger.ts';
 
 async function main(): Promise<void> {
   await runMigrations();
   logger.info('indexer started');
-  await startArcIndexer();
+  await Promise.all([startArcIndexer(), startBaseIndexer()]);
 }
 
 main().catch(async (error: unknown) => {

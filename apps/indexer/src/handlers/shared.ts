@@ -238,6 +238,8 @@ async function insertEvent(chainId: string, log: EventLog): Promise<void> {
       contractAddress: String(log.address).toLowerCase(),
       eventName: log.eventName ?? 'Unknown',
       args: normalizeJson(log.args ?? {}),
+      confirmations: initialConfirmations(chainId),
+      confirmed: chainId !== '8453',
       timestamp: eventTimestamp(log),
     })
     .onConflictDoNothing();
@@ -293,6 +295,10 @@ function blockNumber(log: EventLog): bigint {
 
 function txHash(log: EventLog): Hash {
   return (log.transactionHash ?? zeroHash()) as Hash;
+}
+
+function initialConfirmations(chainId: string): number {
+  return chainId === '8453' ? 0 : 1;
 }
 
 function eventTimestamp(_log: EventLog): Date {

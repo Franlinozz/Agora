@@ -113,6 +113,8 @@ export const events = pgTable(
     contractAddress: text('contract_address').notNull(),
     eventName: text('event_name').notNull(),
     args: jsonb('args').notNull(),
+    confirmations: integer('confirmations').default(0).notNull(),
+    confirmed: boolean('confirmed').default(true).notNull(),
     timestamp: timestamp('timestamp').notNull(),
   },
   (t) => ({
