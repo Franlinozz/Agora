@@ -1,0 +1,41 @@
+name: Contracts test
+
+on:
+  pull_request:
+    paths:
+      - 'packages/contracts/**'
+      - '.github/workflows/contracts-test.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'packages/contracts/**'
+      - '.github/workflows/contracts-test.yml'
+
+concurrency:
+  group: contracts-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  forge:
+    name: Foundry tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/contracts
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: stable
+
+      - name: Forge build
+        run: forge build
+
+      - name: Forge test with gas report
+        run: forge test --gas-report
