@@ -1,0 +1,3 @@
+export type TimeRange = 'all' | '30d' | '7d' | '24h';
+const ranges: Array<{ value: TimeRange; label: string }> = [{ value: 'all', label: 'All-time' }, { value: '30d', label: '30 days' }, { value: '7d', label: '7 days' }, { value: '24h', label: '24 hours' }];
+export function TimeRangeFilter({ value, onChange }: { value: TimeRange; onChange: (value: TimeRange) => void }) { return <select value={value} onChange={(event) => onChange(event.target.value as TimeRange)} className="h-10 rounded-md border border-[var(--color-bg-3)] bg-[var(--color-bg-1)] px-3 text-sm outline-none">{ranges.map((range) => <option key={range.value} value={range.value}>{range.label}</option>)}</select>; }
