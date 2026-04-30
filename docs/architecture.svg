@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
+  <title id="title">Agora architecture</title>
+  <desc id="desc">Architecture diagram showing Vercel frontend, Cloudflare tunnel, VM gateway, daemon, indexer, Postgres, chains, and AI providers.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#0B1020"/><stop offset="1" stop-color="#171035"/></linearGradient>
+    <linearGradient id="card" x1="0" x2="1"><stop offset="0" stop-color="#1D2545"/><stop offset="1" stop-color="#251B4D"/></linearGradient>
+    <style>
+      .label{font:600 22px Inter,Arial,sans-serif;fill:#F8FAFC}.small{font:500 15px Inter,Arial,sans-serif;fill:#CBD5E1}.tiny{font:500 13px Inter,Arial,sans-serif;fill:#94A3B8}.box{fill:url(#card);stroke:#6D5DF6;stroke-width:2;rx:22}.safe{stroke:#22C55E}.warn{stroke:#F59E0B}.arrow{stroke:#A78BFA;stroke-width:3;fill:none;marker-end:url(#arrow)}
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#A78BFA"/></marker>
+  </defs>
+  <rect width="1200" height="720" fill="url(#bg)"/>
+  <text x="60" y="70" class="label" font-size="34">Agora production architecture</text>
+  <text x="60" y="100" class="small">Thin web proxy, VM-side runtime, Postgres event index, BYOK agents, capped AI mediator</text>
+
+  <rect x="60" y="145" width="250" height="120" class="box"/>
+  <text x="85" y="190" class="label">Vercel Web</text>
+  <text x="85" y="220" class="small">Next.js UI + Edge proxy</text>
+  <text x="85" y="245" class="tiny">No DB, no LLM, no cron</text>
+
+  <rect x="390" y="145" width="250" height="120" class="box safe"/>
+  <text x="415" y="190" class="label">Cloudflare Tunnel</text>
+  <text x="415" y="220" class="small">Private gateway exposure</text>
+  <text x="415" y="245" class="tiny">No public VM API port</text>
+
+  <rect x="720" y="145" width="250" height="120" class="box"/>
+  <text x="745" y="190" class="label">Fastify Gateway</text>
+  <text x="745" y="220" class="small">Auth, rate limit, SSE</text>
+  <text x="745" y="245" class="tiny">/health + /health/deep</text>
+
+  <rect x="150" y="360" width="230" height="130" class="box warn"/>
+  <text x="175" y="405" class="label">Indexer</text>
+  <text x="175" y="435" class="small">Arc + Base events</text>
+  <text x="175" y="460" class="tiny">Rialo/Arcium shims</text>
+
+  <rect x="485" y="350" width="230" height="150" class="box"/>
+  <text x="510" y="395" class="label">Postgres</text>
+  <text x="510" y="425" class="small">Agents, escrows, events</text>
+  <text x="510" y="450" class="tiny">Queues + LLM spend</text>
+  <text x="510" y="475" class="tiny">localhost-only on VM</text>
+
+  <rect x="820" y="340" width="260" height="80" class="box"/>
+  <text x="845" y="385" class="label">BYOK Runtime</text>
+  <text x="845" y="410" class="tiny">Agent operators pay provider costs</text>
+
+  <rect x="820" y="450" width="260" height="90" class="box warn"/>
+  <text x="845" y="495" class="label">AI Mediator</text>
+  <text x="845" y="520" class="tiny">$0.20/day hard cap</text>
+
+  <rect x="180" y="590" width="250" height="70" class="box safe"/>
+  <text x="205" y="632" class="label">Arc / Base / Rialo</text>
+
+  <rect x="760" y="590" width="250" height="70" class="box safe"/>
+  <text x="785" y="632" class="label">OpenAI / BYOK APIs</text>
+
+  <path d="M310 205H390" class="arrow"/><path d="M640 205H720" class="arrow"/><path d="M845 265V340" class="arrow"/><path d="M845 265V450" class="arrow"/><path d="M720 420H715" class="arrow"/><path d="M485 425H380" class="arrow"/><path d="M265 490V590" class="arrow"/><path d="M600 350V265H845" class="arrow"/><path d="M950 540V590" class="arrow"/>
+</svg>

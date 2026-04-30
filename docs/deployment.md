@@ -1,6 +1,15 @@
 # Agora deployment
 
-This runbook covers the production deployment path for Agora: GitHub Actions CI/CD, the GCP VM backend, Vercel frontend, Cloudflare Tunnel, backups, and release safety checks.
+This runbook covers production deployment for Agora: GitHub Actions CI/CD, the GCP VM backend, Vercel frontend, Cloudflare Tunnel, backups, cost monitoring, and release safety checks.
+
+## Deployment surfaces
+
+Agora has two production surfaces:
+
+1. **Vercel frontend** — `apps/web`, static/UI pages, and thin proxy API routes.
+2. **GCP VM backend** — Docker Compose stack running Postgres, indexer, daemon, and Cloudflare Tunnel.
+
+The frontend never talks directly to Postgres, RPC pollers, cron jobs, or LLM providers. It proxies API requests to the daemon through Cloudflare Tunnel.
 
 ## Required GitHub secrets
 
@@ -76,8 +85,17 @@ Create `/opt/agora/.env` from `.env.example` and fill production values. Critica
 - `OPENAI_API_KEY`
 - `MEDIATOR_SECRET_KEY`
 - `CLOUDFLARE_TUNNEL_TOKEN`
+- deployer/private operational keys only when needed
 
 Do **not** commit `.env`.
+
+## Docker Compose
+
+Validate config on a machine with Docker:
+
+```bash
+POSTGRES_PASSWORD=dummy CLOUDFLARE_TUNNEL_TOKEN=dummy docker compose -f docker-compose.yml -f docker-compose.prod.yml config
+```
 
 Start services:
 
@@ -94,6 +112,8 @@ Deep health should become `200` only after Postgres is migrated, chain RPCs are 
 curl http://127.0.0.1:4000/health/deep
 ```
 
+Postgres is bound to `127.0.0.1:5432`; daemon is bound to `127.0.0.1:4000`; neither should be publicly exposed.
+
 ## Cloudflare Tunnel
 
 Create a tunnel that routes the public API hostname, for example `https://api.agora.example.com`, to the daemon service:
@@ -106,6 +126,8 @@ Store the tunnel token in `CLOUDFLARE_TUNNEL_TOKEN`. The Compose service runs `c
 
 ## Vercel setup
 
+Detailed instructions live in [vercel-setup.md](vercel-setup.md).
+
 Set production env vars in the Vercel dashboard:
 
 - Public chain variables: `NEXT_PUBLIC_ARC_RPC_URL`, `NEXT_PUBLIC_BASE_RPC_URL`, contract addresses, and `NEXT_PUBLIC_RAINBOWKIT_PROJECT_ID`.
@@ -117,6 +139,8 @@ Never set VM-only secrets in Vercel:
 - `OPENAI_API_KEY`
 - `MEDIATOR_SECRET_KEY`
 - `DAEMON_MASTER_KEY`
+- `DATABASE_URL`
+- `POSTGRES_PASSWORD`
 - deployer private keys
 
 ## Deployments
@@ -169,6 +193,13 @@ Set alerts before launch:
 - OpenAI usage alert.
 - Optional weekly manual review of Cloudflare, Vercel, GCP, and OpenAI usage.
 
+Cost invariants:
+
+- Vercel functions are proxy-only.
+- Mediator LLM spend is capped per UTC day.
+- BYOK agent runtime cost is paid by agent operators.
+- Docker memory limits fit under the target VM budget.
+
 ## Release safety checklist
 
 Before merging release PRs:
@@ -176,11 +207,8 @@ Before merging release PRs:
 1. CI passes.
 2. Contract tests pass if Solidity changed.
 3. No `.env` or private key changes are staged.
-4. Docker Compose config validates on a machine with Docker:
-
-```bash
-POSTGRES_PASSWORD=dummy CLOUDFLARE_TUNNEL_TOKEN=dummy docker compose -f docker-compose.yml -f docker-compose.prod.yml config
-```
-
+4. Docker Compose config validates on a machine with Docker.
 5. VM `/health` returns `200` after deploy.
 6. VM `/health/deep` returns `200` before public launch.
+7. Smoke test script passes against production.
+8. Backup restore has been tested at least once before mainnet usage.
