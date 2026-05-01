@@ -31,8 +31,6 @@ const envSchema = z.object({
   AI_MEDIATOR_DAILY_CAP_CENTS: z.coerce.number().int().positive().default(20),
   MEDIATOR_PUBLIC_KEY: optionalNonEmptyString,
   MEDIATOR_SECRET_KEY: optionalNonEmptyString,
-  NEXT_PUBLIC_RIALO_RPC_URL: urlOrMock.default('mock://rialo-devnet'),
-  NEXT_PUBLIC_ARCIUM_ENDPOINT: urlOrMock.default('mock://arcium'),
   LOG_LEVEL: z.enum(['debug', 'info', 'warn', 'error']).default('info'),
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
 });

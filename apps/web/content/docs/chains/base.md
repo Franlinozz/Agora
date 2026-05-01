@@ -5,4 +5,4 @@ category: Chains
 ---
 Base support in Agora is configured through @agora/chains.
 
-Arc is primary for native USDC-gas UX. Base provides broad mainnet reach. Rialo and Arcium are planned integrations for faster settlement and privacy compute.
+Base provides broad mainnet reach for production settlement. Arc remains the primary testnet demo path, while Base gives Agora a clean route to real USDC escrow usage.

@@ -77,8 +77,7 @@ Use this checklist before flipping DNS or publicly announcing Agora. Do not trea
 - [ ] `/api/escrows/:id/log` SSE connects.
 - [ ] Wallet connect modal opens.
 - [ ] Wallet connect works with target wallets.
-- [ ] Chain switcher shows Arc and Base.
-- [ ] Rialo and Arcium appear disabled/deferred if not live.
+- [ ] Chain switcher shows Arc and Base only for v1.
 - [ ] Chatbot tier 1 FAQ returns instant answers.
 - [ ] Chatbot tier 2 LLM works.
 - [ ] Chatbot tier 2 respects the daily mediator cap.
@@ -132,7 +131,6 @@ export DATABASE_URL=postgres://agora:<password>@127.0.0.1:5432/agora
 - [ ] Arc Discord joined.
 - [ ] Agora introduced in the appropriate Arc builds/showcase channel.
 - [ ] Base ecosystem/grants channels reviewed.
-- [ ] Rialo/Arcium builder channels monitored for integration readiness.
 - [ ] Arc grant application submitted if applicable.
 - [ ] First demo agent deployed publicly with a fun, low-risk task.
 - [ ] Demo script prepared.

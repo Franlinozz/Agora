@@ -1,7 +1,7 @@
 'use client';
 
-import React from 'react';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
+import React from 'react';
 
 import { Badge } from '../primitives/Badge.tsx';
 import { Button } from '../primitives/Button.tsx';

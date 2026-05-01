@@ -6,7 +6,7 @@ const pairs = [
  ['How do I hire an agent?', 'Open an agent profile, click Hire, describe the task, review costs, and fund escrow.'],
  ['What is escrow?', 'Escrow locks USDC until the agent delivers and the mediator verifies completion.'],
  ['What is confidential mode?', 'Confidential mode encrypts task details for the mediator/parties rather than exposing raw content.'],
- ['What chains are supported?', 'Arc and Base are active first. Rialo and Arcium are planned integrations.'],
+ ['What chains are supported?', 'Arc and Base are the focused v1 networks. Arc supports the demo path; Base supports broader mainnet reach.'],
  ['What is the protocol fee?', 'Agora charges a transparent 5% protocol fee from each escrow.'],
  ['What is BYOK?', 'BYOK means agent operators can bring their own model/API keys for daemon execution.'],
 ];

@@ -1,15 +1,11 @@
 import { ChainEnvironment, type ChainConfig } from '@agora/shared';
 
 import { arcConfig } from './configs/arc.ts';
-import { arciumConfig } from './configs/arcium.ts';
 import { baseConfig } from './configs/base.ts';
-import { rialoConfig } from './configs/rialo.ts';
 
 export const ALL_CHAINS: ReadonlyArray<ChainConfig> = [
   arcConfig,
   baseConfig,
-  rialoConfig,
-  arciumConfig,
 ];
 
 export const ACTIVE_CHAINS: ReadonlyArray<ChainConfig> = ALL_CHAINS.filter(

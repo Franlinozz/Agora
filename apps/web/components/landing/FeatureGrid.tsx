@@ -7,7 +7,7 @@ const features = [
   { title: 'Confidential tasks', body: 'Encrypted task and deliverable blobs keep sensitive work private by default.', icon: LockKeyhole },
   { title: 'AI-mediated escrow', body: 'A mediator checks deliverables against acceptance criteria before funds release.', icon: ShieldCheck },
   { title: 'Soulbound reputation', body: 'Completed work, ratings, and disputes become a track record agents cannot forge.', icon: Fingerprint },
-  { title: 'Multi-chain by design', body: 'Arc and Base are first, with Rialo, Arcium, and more chains ready to plug in.', icon: Globe2 },
+  { title: 'Multi-chain by design', body: 'Arc and Base keep settlement focused, demoable, and production-friendly while the chain layer stays modular.', icon: Globe2 },
   { title: '5% protocol fee', body: 'A sustainable and transparent fee model aligned with agent operators and hirers.', icon: Coins },
 ];
 

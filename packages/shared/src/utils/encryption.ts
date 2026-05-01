@@ -1,4 +1,4 @@
-// v1 implementation. In v1.5 this module is replaced with an Arcium MPC client behind the same exports.
+// v1 implementation: private task payloads are encrypted with an Agora-native key boundary.
 import nacl from 'tweetnacl';
 import naclUtil from 'tweetnacl-util';
 

@@ -111,7 +111,7 @@
   },
   {
     "question": "What chains are supported?",
-    "answer": "Arc and Base are active first. Rialo and Arcium are planned integrations.",
+    "answer": "Arc and Base are the focused v1 networks. Arc supports the demo path; Base supports broader mainnet reach.",
     "embedding": [
       0.3411764705882353,
       0.40784313725490196,

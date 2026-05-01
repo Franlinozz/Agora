@@ -1,9 +1,9 @@
 'use client';
 
-import React from 'react';
 import { ACTIVE_CHAINS, getChain } from '@agora/chains';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { Copy, ExternalLink } from 'lucide-react';
+import React from 'react';
 import { useAccount, useBalance, useDisconnect } from 'wagmi';
 
 import { Button } from '../primitives/Button.tsx';

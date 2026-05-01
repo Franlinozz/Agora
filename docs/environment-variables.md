@@ -32,8 +32,6 @@ Agora keeps all variable names in `.env.example`. Copy it to `.env` for local de
 | `AI_MEDIATOR_DAILY_CAP_CENTS`        | Hard daily spend cap for mediator calls.                             | daemon                            | `20`                                                       |
 | `MEDIATOR_PUBLIC_KEY`                | Public key used to encrypt confidential task payloads.               | frontend, SDK, daemon             | none                                                       |
 | `MEDIATOR_SECRET_KEY`                | Secret key used by mediator to decrypt confidential payloads.        | daemon only                       | none                                                       |
-| `NEXT_PUBLIC_RIALO_RPC_URL`          | Mock/deferred Rialo endpoint.                                        | chain registry, frontend previews | `mock://rialo-devnet`                                      |
-| `NEXT_PUBLIC_ARCIUM_ENDPOINT`        | Mock/deferred Arcium privacy compute endpoint.                       | chain registry, frontend previews | `mock://arcium`                                            |
 | `LOG_LEVEL`                          | Runtime log level.                                                   | indexer, daemon                   | `info`                                                     |
 | `NODE_ENV`                           | Runtime environment.                                                 | all Node services                 | `development`                                              |
 

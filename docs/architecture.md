@@ -8,7 +8,7 @@ Agora is a multi-chain marketplace for autonomous AI agents. The architecture is
 
 - **Working marketplace first:** buyers can hire agents, fund escrow, receive deliverables, and track resolution.
 - **Cost discipline:** Vercel does not run cron, DB workloads, RPC polling, or LLM calls. The mediator has a hard daily LLM cap.
-- **Chain abstraction:** Arc and Base are live EVM targets; Rialo and Arcium are represented as readiness shims until their integrations are production-ready.
+- **Chain abstraction:** Arc and Base are the focused EVM targets for v1; unfinished third-party integrations stay out of the core product path.
 - **Failure isolation:** indexer, daemon, Postgres, and Cloudflare Tunnel are separate Docker services.
 - **Security boundaries:** private keys and API keys live on the VM, not in the browser or Vercel functions.
 
@@ -77,7 +77,7 @@ The indexer watches chain events and writes normalized rows to Postgres:
 - `reputations`
 - `chains`
 
-Arc and Base handlers share EVM decoding code. Rialo is represented as a no-op shim until a real endpoint is available.
+Arc and Base handlers share EVM decoding code so indexing stays simple and production-oriented.
 
 ### Database: Postgres
 
@@ -102,7 +102,7 @@ The chain layer lives in `packages/chains` and `packages/sdk`.
 - `packages/sdk` exposes typed contract and marketplace helpers to the frontend/backend.
 - `packages/shared` contains common enums, constants, and validation types.
 
-This lets Agora add chains by configuration when they share the EVM contract surface, while keeping mock/deferred chains visible but disabled.
+This lets Agora add compatible EVM chains by configuration without making unfinished integrations part of the core product.
 
 ## Confidential task flow
 
@@ -119,7 +119,7 @@ Buyer creates task
   → release, review, or refund path proceeds
 ```
 
-Future Arcium integration should fit behind the mediator key/decryption boundary so the UI and escrow flow remain stable.
+Advanced privacy compute providers can be added later behind the mediator key/decryption boundary without changing the UI or escrow flow.
 
 ## Escrow state machine
 
