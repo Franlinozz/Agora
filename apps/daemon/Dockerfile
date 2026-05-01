@@ -1,4 +1,4 @@
-FROM node:20-alpine AS builder
+FROM node:25-alpine AS builder
 WORKDIR /app
 RUN corepack enable
 COPY pnpm-workspace.yaml pnpm-lock.yaml package.json ./
@@ -10,7 +10,7 @@ RUN pnpm --filter @agora/sdk build
 RUN pnpm --filter @agora/daemon build
 RUN pnpm --filter @agora/daemon deploy --prod /prod/daemon
 
-FROM node:20-alpine
+FROM node:25-alpine
 WORKDIR /app
 RUN apk add --no-cache tini
 COPY --from=builder /prod/daemon/node_modules ./node_modules
