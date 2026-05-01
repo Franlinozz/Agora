@@ -1,6 +1,7 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "globalDependencies": [".env"],
+  "globalEnv": ["API_GATEWAY_URL", "API_GATEWAY_SECRET"],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
