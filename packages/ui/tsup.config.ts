@@ -7,7 +7,15 @@ export default defineConfig({
   sourcemap: true,
   clean: true,
   treeshake: true,
-  external: ['react', 'react-dom'],
+  external: [
+    'react',
+    'react-dom',
+    'wagmi',
+    'viem',
+    '@rainbow-me/rainbowkit',
+    '@rainbow-me/rainbowkit/wallets',
+    '@tanstack/react-query',
+  ],
   loader: { '.css': 'copy' },
   outExtension({ format }) {
     return { js: format === 'esm' ? '.mjs' : '.js' };

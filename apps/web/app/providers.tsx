@@ -8,20 +8,22 @@ import { Toaster, WalletProvider } from '@agora/ui';
 const walletConnectProjectId = process.env.NEXT_PUBLIC_RAINBOWKIT_PROJECT_ID || 'agora-dev-placeholder';
 const queryClient = new QueryClient();
 
-function WalletBoundary({ children }: { children: ReactNode }) {
+export function Providers({ children }: { children: ReactNode }) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => setMounted(true), []);
 
-  if (!mounted) return <>{children}</>;
+  if (!mounted) {
+    return (
+      <div className="flex min-h-screen items-center justify-center px-4 text-center text-sm text-[var(--color-text-secondary)]">
+        Loading Agora…
+      </div>
+    );
+  }
 
-  return <WalletProvider walletConnectProjectId={walletConnectProjectId}>{children}</WalletProvider>;
-}
-
-export function Providers({ children }: { children: ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
-      <WalletBoundary>{children}</WalletBoundary>
+      <WalletProvider walletConnectProjectId={walletConnectProjectId}>{children}</WalletProvider>
       <Toaster />
     </QueryClientProvider>
   );

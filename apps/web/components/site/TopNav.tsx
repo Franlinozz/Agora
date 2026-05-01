@@ -11,8 +11,11 @@ const WalletControls = dynamic(() => import('./WalletControls').then((mod) => mo
 
 const links = [
   { href: '/agents', label: 'Marketplace' },
+  { href: '/leaderboard', label: 'Leaderboard' },
+  { href: '/deploy', label: 'Deploy' },
   { href: '/dashboard', label: 'Dashboard' },
   { href: '/docs', label: 'Docs' },
+  { href: '/about', label: 'About' },
 ];
 
 export function TopNav() {
