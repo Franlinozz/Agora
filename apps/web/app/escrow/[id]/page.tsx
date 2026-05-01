@@ -1,3 +1,5 @@
+import { arcConfig } from '@agora/chains';
+
 import { DeliveryViewer } from '@/components/escrow/DeliveryViewer';
 import { DisputeModal } from '@/components/escrow/DisputeModal';
 import { EscrowHeader, type EscrowDetail } from '@/components/escrow/EscrowHeader';
@@ -7,7 +9,7 @@ import { StateMachine } from '@/components/escrow/StateMachine';
 function mockEscrow(id: string): EscrowDetail {
   return {
     id,
-    chainId: 28282,
+    chainId: Number(arcConfig.id),
     buyer: '0x1111111111111111111111111111111111111111',
     agentOwner: '0x2222222222222222222222222222222222222222',
     agentName: `Agora Agent #${id}`,

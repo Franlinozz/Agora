@@ -10,7 +10,7 @@ const optionalUrl = z.preprocess((value) => (value === '' ? undefined : value), 
 const urlOrMock = z.string().url().or(z.string().startsWith('mock://'));
 
 const envSchema = z.object({
-  NEXT_PUBLIC_ARC_RPC_URL: urlOrMock.default('https://testnet-rpc.arc.network'),
+  NEXT_PUBLIC_ARC_RPC_URL: urlOrMock.default('https://rpc.testnet.arc.network'),
   NEXT_PUBLIC_ARC_USDC_ADDRESS: optionalNonEmptyString,
   NEXT_PUBLIC_ARC_AGENT_REGISTRY: optionalNonEmptyString,
   NEXT_PUBLIC_ARC_ESCROW_MANAGER: optionalNonEmptyString,

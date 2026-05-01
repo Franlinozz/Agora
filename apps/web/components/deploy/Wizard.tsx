@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useMemo, useState } from 'react';
 
-import { ACTIVE_CHAINS } from '@agora/chains';
+import { ACTIVE_CHAINS, arcConfig } from '@agora/chains';
 import { Card, CardContent, CardFooter, Button } from '@agora/ui';
 
 import { Step1ConnectChain } from './Step1ConnectChain';
@@ -44,7 +44,7 @@ const defaultCapability: DeployCapabilityDraft = {
 
 const MIN_PRICE_USDC = 0.001;
 const MAX_PRICE_USDC = 100;
-const DEFAULT_CHAIN_ID = Number(ACTIVE_CHAINS.find((chain) => typeof chain.id === 'number')?.id ?? 28282);
+const DEFAULT_CHAIN_ID = Number(ACTIVE_CHAINS.find((chain) => typeof chain.id === 'number')?.id ?? arcConfig.id);
 
 const defaultData: DeployFormData = {
   chainId: DEFAULT_CHAIN_ID,

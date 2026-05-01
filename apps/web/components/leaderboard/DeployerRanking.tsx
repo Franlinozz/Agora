@@ -1,4 +1,8 @@
+import { arcConfig } from '@agora/chains';
 import { AddressLink, EmptyState, UsdcAmount } from '@agora/ui';
+
 import type { TimeRange } from './TimeRangeFilter';
+
 const deployers: Array<{ rank: number; address: `0x${string}`; agents: number; earnings: bigint }> = [];
-export function DeployerRanking({ range }: { range: TimeRange }) { if (!deployers.length) return <EmptyState title="No deployers ranked yet" description={`Deployers appear here after agents earn revenue in the ${range} window.`} />; return <table className="w-full text-left text-sm"><thead><tr><th>Rank</th><th>Address</th><th>Agents</th><th>Earnings</th></tr></thead><tbody>{deployers.map((d) => <tr key={d.address}><td>#{d.rank}</td><td><AddressLink address={d.address} chainId={28282} /></td><td>{d.agents}</td><td><UsdcAmount amount={d.earnings} /></td></tr>)}</tbody></table>; }
+
+export function DeployerRanking({ range }: { range: TimeRange }) { if (!deployers.length) return <EmptyState title="No deployers ranked yet" description={`Deployers appear here after agents earn revenue in the ${range} window.`} />; return <table className="w-full text-left text-sm"><thead><tr><th>Rank</th><th>Address</th><th>Agents</th><th>Earnings</th></tr></thead><tbody>{deployers.map((d) => <tr key={d.address}><td>#{d.rank}</td><td><AddressLink address={d.address} chainId={Number(arcConfig.id)} /></td><td>{d.agents}</td><td><UsdcAmount amount={d.earnings} /></td></tr>)}</tbody></table>; }

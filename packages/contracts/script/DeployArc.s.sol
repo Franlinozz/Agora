@@ -23,16 +23,15 @@ contract DeployArc is Script {
         ERC6551Account accountImplementation = new ERC6551Account();
         console2.log("ERC6551AccountImpl:", address(accountImplementation));
 
-        AgentRegistry registry = new AgentRegistry(
-            CANONICAL_ERC6551_REGISTRY,
-            address(accountImplementation)
-        );
+        AgentRegistry registry =
+            new AgentRegistry(CANONICAL_ERC6551_REGISTRY, address(accountImplementation));
         console2.log("AgentRegistry:", address(registry));
 
         ReputationOracle reputation = new ReputationOracle();
         console2.log("ReputationOracle:", address(reputation));
 
-        EscrowManager escrow = new EscrowManager(ARC_USDC, address(registry), mediator, feeRecipient);
+        EscrowManager escrow =
+            new EscrowManager(ARC_USDC, address(registry), mediator, feeRecipient);
         console2.log("EscrowManager:", address(escrow));
 
         escrow.setReputationOracle(address(reputation));

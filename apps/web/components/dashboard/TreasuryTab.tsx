@@ -1,13 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { ACTIVE_CHAINS } from '@agora/chains';
+import { ACTIVE_CHAINS, arcConfig } from '@agora/chains';
 
 import { Button, Card, CardContent, ChainBadge, Input, toast } from '@agora/ui';
 
 export function TreasuryTab({ address }: { address: string }) {
   const evmChains = ACTIVE_CHAINS.filter((chain) => typeof chain.id === 'number');
-  const [source, setSource] = useState(String(evmChains[0]?.id ?? 28282));
+  const [source, setSource] = useState(String(evmChains[0]?.id ?? arcConfig.id));
   const [destination, setDestination] = useState(String(evmChains[1]?.id ?? evmChains[0]?.id ?? 8453));
   const [amount, setAmount] = useState('');
 

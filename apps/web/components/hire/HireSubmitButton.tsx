@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useWalletClient } from 'wagmi';
 import { parseUnits } from 'viem';
+import { arcConfig } from '@agora/chains';
 import { AgoraClient } from '@agora/sdk';
 
 import { Button, toast } from '@agora/ui';
@@ -23,7 +24,7 @@ export function HireSubmitButton({ agentId, draft }: { agentId: string; draft: H
 
     setStatus('checking');
     try {
-      const client = new AgoraClient({ defaultChainId: 28282, account: walletClient.account });
+      const client = new AgoraClient({ defaultChainId: Number(arcConfig.id), account: walletClient.account });
       setStatus('pending');
       const result = await client.hire({
         agentId: BigInt(agentId),
