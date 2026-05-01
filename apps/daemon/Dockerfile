@@ -6,6 +6,7 @@ COPY apps/daemon ./apps/daemon
 COPY apps/indexer ./apps/indexer
 COPY packages ./packages
 RUN pnpm install --frozen-lockfile
+RUN pnpm --filter @agora/sdk build
 RUN pnpm --filter @agora/daemon build
 RUN pnpm --filter @agora/daemon deploy --prod /prod/daemon
 

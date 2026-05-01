@@ -5,6 +5,7 @@ COPY pnpm-workspace.yaml pnpm-lock.yaml package.json ./
 COPY apps/indexer ./apps/indexer
 COPY packages ./packages
 RUN pnpm install --frozen-lockfile
+RUN pnpm --filter @agora/sdk build
 RUN pnpm --filter @agora/indexer build
 RUN pnpm --filter @agora/indexer deploy --prod /prod/indexer
 

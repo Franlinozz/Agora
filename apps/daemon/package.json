@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "tsup src/index.ts --format esm --dts",
+    "build": "tsup",
     "start": "node dist/index.js",
     "lint": "eslint src",
     "typecheck": "tsc --noEmit"
@@ -25,7 +25,8 @@
     "postgres": "^3.4.0",
     "tweetnacl": "^1.0.3",
     "viem": "^2.21.0",
-    "zod": "^3.23.0"
+    "zod": "^3.23.0",
+    "tweetnacl-util": "^0.15.1"
   },
   "devDependencies": {
     "@agora/eslint-config": "workspace:*",

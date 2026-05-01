@@ -68,6 +68,9 @@ importers:
       tweetnacl:
         specifier: ^1.0.3
         version: 1.0.3
+      tweetnacl-util:
+        specifier: ^0.15.1
+        version: 0.15.1
       viem:
         specifier: ^2.21.0
         version: 2.48.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@3.25.76)
@@ -117,6 +120,12 @@ importers:
       postgres:
         specifier: ^3.4.0
         version: 3.4.9
+      tweetnacl:
+        specifier: ^1.0.3
+        version: 1.0.3
+      tweetnacl-util:
+        specifier: ^0.15.1
+        version: 0.15.1
       viem:
         specifier: ^2.21.0
         version: 2.48.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.4.1)
