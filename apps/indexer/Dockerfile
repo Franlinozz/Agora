@@ -1,4 +1,4 @@
-FROM node:20-alpine AS builder
+FROM node:25-alpine AS builder
 WORKDIR /app
 RUN corepack enable
 COPY pnpm-workspace.yaml pnpm-lock.yaml package.json ./
@@ -9,7 +9,7 @@ RUN pnpm --filter @agora/sdk build
 RUN pnpm --filter @agora/indexer build
 RUN pnpm --filter @agora/indexer deploy --prod /prod/indexer
 
-FROM node:20-alpine
+FROM node:25-alpine
 WORKDIR /app
 COPY --from=builder /prod/indexer/node_modules ./node_modules
 COPY --from=builder /app/apps/indexer/dist ./dist
