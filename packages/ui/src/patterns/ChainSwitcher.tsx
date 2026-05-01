@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import { ACTIVE_CHAINS, ALL_CHAINS } from '@agora/chains';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { useChainId, useSwitchChain } from 'wagmi';
