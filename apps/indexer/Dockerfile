@@ -6,12 +6,13 @@ COPY apps/indexer ./apps/indexer
 COPY packages ./packages
 RUN pnpm install --frozen-lockfile
 RUN pnpm --filter @agora/indexer build
+RUN pnpm --filter @agora/indexer deploy --prod /prod/indexer
 
 FROM node:20-alpine
 WORKDIR /app
+COPY --from=builder /prod/indexer/node_modules ./node_modules
 COPY --from=builder /app/apps/indexer/dist ./dist
 COPY --from=builder /app/apps/indexer/package.json ./
 COPY --from=builder /app/apps/indexer/migrations ./migrations
-COPY --from=builder /app/node_modules ./node_modules
 USER node
 CMD ["node", "dist/index.js"]

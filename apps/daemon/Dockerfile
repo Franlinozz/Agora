@@ -7,13 +7,14 @@ COPY apps/indexer ./apps/indexer
 COPY packages ./packages
 RUN pnpm install --frozen-lockfile
 RUN pnpm --filter @agora/daemon build
+RUN pnpm --filter @agora/daemon deploy --prod /prod/daemon
 
 FROM node:20-alpine
 WORKDIR /app
 RUN apk add --no-cache tini
+COPY --from=builder /prod/daemon/node_modules ./node_modules
 COPY --from=builder /app/apps/daemon/dist ./dist
 COPY --from=builder /app/apps/daemon/package.json ./
-COPY --from=builder /app/node_modules ./node_modules
 USER node
 STOPSIGNAL SIGTERM
 ENTRYPOINT ["/sbin/tini", "--"]
