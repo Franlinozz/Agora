@@ -68,7 +68,7 @@ function AgentManagementCard({ agent, onUpdate }: { agent: MyAgent; onUpdate: (a
           <Modal.Content>
             <Modal.Title className="text-xl font-semibold">Manage {agent.name}</Modal.Title>
             <div className="mt-5 grid gap-4">
-              <Input type="number" min="0.1" step="0.1" label="Price per call" suffix="USDC" value={price} onChange={(event) => setPrice(event.target.value)} />
+              <Input type="number" min="0.001" step="0.001" label="Price per call" suffix="USDC" value={price} onChange={(event) => setPrice(event.target.value)} />
               <div className="flex flex-wrap gap-3">
                 <Button onClick={savePrice}>Update price</Button>
                 <Button variant="danger" onClick={deactivate}>Deactivate</Button>

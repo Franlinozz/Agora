@@ -23,7 +23,7 @@ contract EscrowManager is IEscrowManager, Ownable2Step, Pausable, ReentrancyGuar
     uint256 private _nextEscrowId = 1;
     mapping(uint256 => Escrow) private _escrows;
 
-    uint256 public constant MIN_ESCROW = 100_000;
+    uint256 public constant MIN_ESCROW = 1_000;
     uint256 public constant MAX_ESCROW = 10_000_000_000;
     uint256 public constant PROTOCOL_FEE_BPS = 500;
     uint16 public constant DEFAULT_RATING_BPS = 7500;

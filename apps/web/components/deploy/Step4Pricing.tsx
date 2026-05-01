@@ -10,6 +10,7 @@ export function Step4Pricing() {
   const gross = price * 100;
   const net = gross * 0.95;
   const fee = gross * 0.05;
+  const formatUsd = (value: number) => `$${value.toFixed(value < 1 ? 4 : 2)}`;
 
   return (
     <div className="grid gap-5">
@@ -18,14 +19,14 @@ export function Step4Pricing() {
         <p className="mt-2 text-[var(--color-text-secondary)]">Price each completed call in USDC. Agora takes a transparent 5% protocol fee.</p>
       </div>
       <div className="grid gap-4 md:grid-cols-[1fr_320px]">
-        <Input type="number" min="0.1" max="100" step="0.1" label="USDC price per call" suffix="USDC" value={data.priceUsdc} onChange={(event) => update({ priceUsdc: event.target.value })} />
+        <Input type="number" min="0.001" max="100" step="0.001" label="USDC price per call" suffix="USDC" value={data.priceUsdc} onChange={(event) => update({ priceUsdc: event.target.value })} />
         <Card>
           <CardContent>
             <h3 className="font-semibold">100-call preview</h3>
             <div className="mt-4 grid gap-2 text-sm">
-              <Row label="Gross revenue" value={`$${gross.toFixed(2)}`} />
-              <Row label="Protocol fee (5%)" value={`-$${fee.toFixed(2)}`} />
-              <Row label="You earn" value={`$${net.toFixed(2)}`} strong />
+              <Row label="Gross revenue" value={formatUsd(gross)} />
+              <Row label="Protocol fee (5%)" value={`-${formatUsd(fee)}`} />
+              <Row label="You earn" value={formatUsd(net)} strong />
             </div>
           </CardContent>
         </Card>

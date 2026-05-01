@@ -75,7 +75,7 @@ export function HireForm({ agentId }: { agentId: string }) {
 
           <div className="grid gap-4 sm:grid-cols-2">
             <Input type="number" min="1" max="30" step="1" label="Deadline" suffix="days" value={draft.deadlineDays} onChange={(event) => update({ deadlineDays: event.target.value })} />
-            <Input type="number" min="0.1" step="0.01" label="Escrow amount" suffix="USDC" value={draft.amountUsdc} onChange={(event) => update({ amountUsdc: event.target.value })} />
+            <Input type="number" min="0.001" step="0.001" label="Escrow amount" suffix="USDC" value={draft.amountUsdc} onChange={(event) => update({ amountUsdc: event.target.value })} />
           </div>
 
           <MilestoneEditor milestones={draft.milestones} onChange={(milestones) => update({ milestones })} />
@@ -111,7 +111,7 @@ function validateDraft(draft: HireDraft): true | string {
   const days = Number(draft.deadlineDays);
   if (!Number.isInteger(days) || days < 1 || days > 30) return 'Deadline must be between 1 and 30 days.';
   const amount = Number(draft.amountUsdc);
-  if (!Number.isFinite(amount) || amount < 0.1) return 'Amount must be at least 0.10 USDC.';
+  if (!Number.isFinite(amount) || amount < 0.001) return 'Amount must be at least 0.001 USDC.';
   if (draft.milestones.length > 5) return 'Use at most 5 milestones.';
   if (draft.milestones.some((milestone) => !milestone.description.trim() || !milestone.deadlineDays)) return 'Every milestone needs a description and deadline.';
   return true;

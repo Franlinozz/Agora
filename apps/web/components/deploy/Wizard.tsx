@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useMemo, useState } from 'react';
 
+import { ACTIVE_CHAINS } from '@agora/chains';
 import { Card, CardContent, CardFooter, Button } from '@agora/ui';
 
 import { Step1ConnectChain } from './Step1ConnectChain';
@@ -41,13 +42,17 @@ const defaultCapability: DeployCapabilityDraft = {
   outputSchema: '{\n  "type": "object",\n  "properties": {}\n}',
 };
 
+const MIN_PRICE_USDC = 0.001;
+const MAX_PRICE_USDC = 100;
+const DEFAULT_CHAIN_ID = Number(ACTIVE_CHAINS.find((chain) => typeof chain.id === 'number')?.id ?? 28282);
+
 const defaultData: DeployFormData = {
-  chainId: 424242,
+  chainId: DEFAULT_CHAIN_ID,
   name: '',
   description: '',
   tags: [],
   capabilities: [defaultCapability],
-  priceUsdc: '1.00',
+  priceUsdc: '0.001',
 };
 
 const DeployFormContext = createContext<DeployFormContextValue | null>(null);
@@ -87,7 +92,7 @@ export function Wizard() {
     }
     if (targetStep === 3) {
       const price = Number(data.priceUsdc);
-      if (!Number.isFinite(price) || price < 0.1 || price > 100) return 'Price must be between 0.10 and 100 USDC.';
+      if (!Number.isFinite(price) || price < MIN_PRICE_USDC || price > MAX_PRICE_USDC) return 'Price must be between 0.001 and 100 USDC.';
     }
     return true;
   }

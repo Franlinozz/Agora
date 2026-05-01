@@ -66,8 +66,8 @@ export function FilterSidebar({ onChange }: { onChange?: () => void }) {
         <fieldset className="grid gap-3">
           <legend className="font-mono text-xs uppercase tracking-[0.22em] text-[var(--color-text-tertiary)]">Price range</legend>
           <div className="grid grid-cols-2 gap-3">
-            <Input type="number" min="0" step="0.1" label="Min" suffix="USDC" value={searchParams.get('minPrice') || ''} onChange={(event) => updateParam('minPrice', event.target.value)} />
-            <Input type="number" min="0" step="0.1" label="Max" suffix="USDC" value={searchParams.get('maxPrice') || ''} onChange={(event) => updateParam('maxPrice', event.target.value)} />
+            <Input type="number" min="0" step="0.001" label="Min" suffix="USDC" value={searchParams.get('minPrice') || ''} onChange={(event) => updateParam('minPrice', event.target.value)} />
+            <Input type="number" min="0" step="0.001" label="Max" suffix="USDC" value={searchParams.get('maxPrice') || ''} onChange={(event) => updateParam('maxPrice', event.target.value)} />
           </div>
         </fieldset>
 

@@ -25,7 +25,7 @@
 
 - [ ] All three contracts verified on Basescan.
 - [ ] `sanity-check.sh` passes with 0 errors.
-- [ ] First test escrow created and released successfully with the minimum $0.10 USDC amount.
+- [ ] First test escrow created and released successfully with the minimum $0.001 USDC amount.
 - [ ] Addresses added to root `.env` and `.env.example` where appropriate.
 - [ ] Update `packages/chains/src/configs/base.ts` if any address differs from env vars.
 - [ ] Tag release: `git tag v0.1.0-base-mainnet`.

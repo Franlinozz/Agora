@@ -59,8 +59,8 @@ contract EscrowManagerTest is Test {
 
     function test_CreateEscrow_RevertOnAmountTooSmall() public {
         vm.prank(buyer);
-        vm.expectRevert(abi.encodeWithSelector(Errors.AmountTooSmall.selector, 99_999, 100_000));
-        escrow.createEscrow(agentId, bytes32(0), 99_999, uint64(block.timestamp + 1), false, "");
+        vm.expectRevert(abi.encodeWithSelector(Errors.AmountTooSmall.selector, 999, 1_000));
+        escrow.createEscrow(agentId, bytes32(0), 999, uint64(block.timestamp + 1), false, "");
     }
 
     function test_CreateEscrow_RevertOnAmountTooLarge() public {
