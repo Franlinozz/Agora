@@ -9,7 +9,7 @@ fi
 source .env
 
 echo "==> Deploying to Arc testnet..."
-forge script script/Deploy.s.sol:Deploy \
+forge script script/DeployArc.s.sol:DeployArc \
   --rpc-url "$ARC_RPC_URL" \
   --broadcast \
   --slow \

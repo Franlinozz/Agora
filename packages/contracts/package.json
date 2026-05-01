@@ -6,7 +6,7 @@
     "build": "forge build",
     "test": "forge test -vv",
     "test:gas": "forge test --gas-report",
-    "deploy:arc": "forge script script/Deploy.s.sol --rpc-url arc_testnet --broadcast --verify",
+    "deploy:arc": "forge script script/DeployArc.s.sol:DeployArc --rpc-url arc_testnet --broadcast",
     "deploy:base": "forge script script/Deploy.s.sol --rpc-url base --broadcast --verify",
     "format": "forge fmt",
     "clean": "forge clean",

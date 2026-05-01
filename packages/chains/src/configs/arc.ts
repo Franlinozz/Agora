@@ -1,17 +1,16 @@
 import { ChainEnvironment, ChainKind, type ChainConfig } from '@agora/shared';
 
-// Arc testnet configuration. Arc is the primary chain for Agora.
-// RPC, USDC address, and contract addresses come from environment variables.
-// The contract addresses are populated after Phase 1 deployment.
+// Arc testnet configuration. Arc is the primary chain for Agora v1.
+// Contract addresses are populated after deployment via environment variables.
 export const arcConfig: ChainConfig = {
-  id: 28282, // placeholder — UPDATE WHEN ARC PUBLISHES OFFICIAL CHAIN ID
+  id: 5_042_002,
   name: 'arc-testnet',
   displayName: 'Arc',
   kind: ChainKind.EVM,
   environment: ChainEnvironment.Testnet,
-  rpcUrl: process.env.NEXT_PUBLIC_ARC_RPC_URL || 'https://testnet-rpc.arc.network',
+  rpcUrl: process.env.NEXT_PUBLIC_ARC_RPC_URL || 'https://rpc.testnet.arc.network',
   nativeUsdcAddress: (process.env.NEXT_PUBLIC_ARC_USDC_ADDRESS ||
-    '0x0000000000000000000000000000000000000000') as `0x${string}`,
+    '0x3600000000000000000000000000000000000000') as `0x${string}`,
   explorerUrl: 'https://testnet.arcscan.app',
   agentRegistryAddress: (process.env.NEXT_PUBLIC_ARC_AGENT_REGISTRY || null) as
     | `0x${string}`
