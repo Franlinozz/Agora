@@ -30,10 +30,10 @@ export function decodeAnyEvent(log: Log, abis: readonly Abi[]): DecodedIndexerLo
   return null;
 }
 
-export function assertHexAddress(address: string | undefined): Hex {
-  if (!address?.startsWith('0x')) {
-    throw new Error(`Invalid contract address: ${address ?? '<missing>'}`);
+export function assertHexAddress(address: string | undefined): Hex | undefined {
+  if (!address) return undefined;
+  if (!address.startsWith('0x')) {
+    throw new Error(`Invalid contract address: ${address}`);
   }
-
   return address as Hex;
 }

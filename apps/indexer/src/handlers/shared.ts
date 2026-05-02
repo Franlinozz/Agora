@@ -1,3 +1,4 @@
+import { Buffer } from 'node:buffer';
 import { getAgent, getEscrow, getReputation, weightedScore } from '@agora/sdk';
 import { EscrowState } from '@agora/shared';
 import { and, eq } from 'drizzle-orm';

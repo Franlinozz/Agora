@@ -12,7 +12,7 @@ export const arcConfig: ChainConfig = {
   nativeUsdcAddress: (process.env.NEXT_PUBLIC_ARC_USDC_ADDRESS ||
     '0x3600000000000000000000000000000000000000') as `0x${string}`,
   explorerUrl: 'https://testnet.arcscan.app',
-  agentRegistryAddress: (process.env.NEXT_PUBLIC_ARC_AGENT_REGISTRY || null) as
+  agentRegistryAddress: (process.env.NEXT_PUBLIC_ARC_AGENT_REGISTRY || '0x0BeA9A8D83a6962410956857D0bD67d59C4D070D') as
     | `0x${string}`
     | null,
   escrowManagerAddress: (process.env.NEXT_PUBLIC_ARC_ESCROW_MANAGER || null) as

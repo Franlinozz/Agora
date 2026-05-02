@@ -47,50 +47,60 @@ export async function startBaseIndexer(): Promise<void> {
     client.getBlockNumber(),
   );
 
-  await backfill(BASE_CHAIN_ID, client, agentRegistryAddress, agentRegistryAbi, handleBackfillLog, {
-    updateProgress: false,
-  });
-  await backfill(BASE_CHAIN_ID, client, escrowManagerAddress, escrowManagerAbi, handleBackfillLog, {
-    updateProgress: false,
-  });
-  await backfill(
-    BASE_CHAIN_ID,
-    client,
-    reputationOracleAddress,
-    reputationOracleAbi,
-    handleBackfillLog,
-    {
+  if (agentRegistryAddress) {
+    await backfill(BASE_CHAIN_ID, client, agentRegistryAddress, agentRegistryAbi, handleBackfillLog, {
       updateProgress: false,
-    },
-  );
+    });
+    client.watchContractEvent({
+      address: agentRegistryAddress,
+      abi: agentRegistryAbi,
+      onLogs: (logs) => void Promise.all(logs.map((log) => handleAny(BASE_CHAIN_ID, log))),
+      onError: (error) =>
+        logger.error({ error, chain: BASE_CHAIN_ID }, 'Base AgentRegistry watcher failed'),
+      pollingInterval: 5_000,
+    });
+  } else {
+    logger.warn({ chain: BASE_CHAIN_ID }, 'AgentRegistry address missing; skipping indexer');
+  }
+
+  if (escrowManagerAddress) {
+    await backfill(BASE_CHAIN_ID, client, escrowManagerAddress, escrowManagerAbi, handleBackfillLog, {
+      updateProgress: false,
+    });
+    client.watchContractEvent({
+      address: escrowManagerAddress,
+      abi: escrowManagerAbi,
+      onLogs: (logs) => void Promise.all(logs.map((log) => handleAny(BASE_CHAIN_ID, log))),
+      onError: (error) =>
+        logger.error({ error, chain: BASE_CHAIN_ID }, 'Base EscrowManager watcher failed'),
+      pollingInterval: 5_000,
+    });
+  } else {
+    logger.warn({ chain: BASE_CHAIN_ID }, 'EscrowManager address missing; skipping indexer');
+  }
+
+  if (reputationOracleAddress) {
+    await backfill(
+      BASE_CHAIN_ID,
+      client,
+      reputationOracleAddress,
+      reputationOracleAbi,
+      handleBackfillLog,
+      { updateProgress: false },
+    );
+    client.watchContractEvent({
+      address: reputationOracleAddress,
+      abi: reputationOracleAbi,
+      onLogs: (logs) => void Promise.all(logs.map((log) => handleAny(BASE_CHAIN_ID, log))),
+      onError: (error) =>
+        logger.error({ error, chain: BASE_CHAIN_ID }, 'Base ReputationOracle watcher failed'),
+      pollingInterval: 5_000,
+    });
+  } else {
+    logger.warn({ chain: BASE_CHAIN_ID }, 'ReputationOracle address missing; skipping indexer');
+  }
+
   await setLastIndexedBlock(BASE_CHAIN_ID, currentHead);
-
-  client.watchContractEvent({
-    address: agentRegistryAddress,
-    abi: agentRegistryAbi,
-    onLogs: (logs) => void Promise.all(logs.map((log) => handleAny(BASE_CHAIN_ID, log))),
-    onError: (error) =>
-      logger.error({ error, chain: BASE_CHAIN_ID }, 'Base AgentRegistry watcher failed'),
-    pollingInterval: 5_000,
-  });
-
-  client.watchContractEvent({
-    address: escrowManagerAddress,
-    abi: escrowManagerAbi,
-    onLogs: (logs) => void Promise.all(logs.map((log) => handleAny(BASE_CHAIN_ID, log))),
-    onError: (error) =>
-      logger.error({ error, chain: BASE_CHAIN_ID }, 'Base EscrowManager watcher failed'),
-    pollingInterval: 5_000,
-  });
-
-  client.watchContractEvent({
-    address: reputationOracleAddress,
-    abi: reputationOracleAbi,
-    onLogs: (logs) => void Promise.all(logs.map((log) => handleAny(BASE_CHAIN_ID, log))),
-    onError: (error) =>
-      logger.error({ error, chain: BASE_CHAIN_ID }, 'Base ReputationOracle watcher failed'),
-    pollingInterval: 5_000,
-  });
 
   setInterval(() => void confirmFinalizedEvents(client), 5_000);
 
@@ -123,17 +133,21 @@ async function handleBackfillLog(chainId: string, log: unknown): Promise<void> {
 }
 
 async function handleAny(chainId: string, log: DecodedLog): Promise<void> {
-  const eventName = log.eventName;
-  if (!eventName) {
-    logger.warn({ chain: chainId }, 'Skipping undecoded log');
-    return;
-  }
+  try {
+    const eventName = log.eventName;
+    if (!eventName) {
+      logger.warn({ chain: chainId }, 'Skipping undecoded log');
+      return;
+    }
 
-  const fn = DISPATCH[eventName];
-  if (!fn) {
-    logger.debug({ chain: chainId, eventName }, 'No handler registered for event');
-    return;
-  }
+    const fn = DISPATCH[eventName];
+    if (!fn) {
+      logger.debug({ chain: chainId, eventName }, 'No handler registered for event');
+      return;
+    }
 
-  await fn(chainId, log);
+    await fn(chainId, log);
+  } catch (error) {
+    logger.error({ error, chain: chainId, log }, 'Fatal error processing log');
+  }
 }

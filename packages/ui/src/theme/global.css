@@ -1,12 +1,12 @@
 :root {
-  --color-bg-0: #0A0B1E;
-  --color-bg-1: #10112A;
-  --color-bg-2: #181A38;
-  --color-bg-3: #222547;
+  --color-bg-0: #0B0B14;
+  --color-bg-1: #12121D;
+  --color-bg-2: #1A1A28;
+  --color-bg-3: #242436;
   --color-text-primary: #FAF4E8;
-  --color-text-secondary: #9C99B8;
-  --color-text-tertiary: #6F6C8C;
-  --color-text-muted: #4A4870;
+  --color-text-secondary: #9C9BA6;
+  --color-text-tertiary: #6F6D7A;
+  --color-text-muted: #4A4854;
   --color-arc-purple: #5C5BD6;
   --color-arc-purple-deep: #3C3489;
   --color-arc-purple-light: #7B7DF4;
@@ -15,7 +15,7 @@
   --color-danger: #E24B4A;
   --color-info: #7BC8F6;
   --color-live: #97C459;
-  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-sans: "Candara", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-mono: "JetBrains Mono", "Fira Code", Consolas, monospace;
   --radius-sm: 6px;
   --radius-md: 8px;

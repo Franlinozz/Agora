@@ -10,6 +10,7 @@ import { Button, cn } from '@agora/ui';
 const WalletControls = dynamic(() => import('./WalletControls').then((mod) => mod.WalletControls), { ssr: false });
 
 const links = [
+  { href: '/', label: 'Home' },
   { href: '/agents', label: 'Marketplace' },
   { href: '/leaderboard', label: 'Leaderboard' },
   { href: '/deploy', label: 'Deploy' },
