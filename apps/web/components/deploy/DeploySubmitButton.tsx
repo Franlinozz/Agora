@@ -35,7 +35,7 @@ export function DeploySubmitButton({ data, capabilities }: { data: DeployFormDat
         throw new Error(`${chain.displayName} deployments are not live yet because NEXT_PUBLIC_${chain.displayName.toUpperCase()}_AGENT_REGISTRY is not configured in Vercel.`);
       }
 
-      const client = new AgoraClient({ defaultChainId: data.chainId, account: walletClient.account });
+      const client = new AgoraClient({ defaultChainId: data.chainId, account: walletClient.account, walletClient });
       setStatus('pending');
       const result = await client.deployAgent({
         name: data.name,

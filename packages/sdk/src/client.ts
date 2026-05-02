@@ -1,7 +1,7 @@
 
 import { getChainOrThrow } from '@agora/chains';
 import { encryptForRecipient } from '@agora/shared';
-import { keccak256, stringToHex, type Account, type Hash, type Hex } from 'viem';
+import { keccak256, stringToHex, type Account, type Hash, type Hex, type WalletClient } from 'viem';
 
 import * as agentContract from './contracts/agentRegistry.ts';
 import * as escrowContract from './contracts/escrowManager.ts';
@@ -16,11 +16,13 @@ import type {
 export class AgoraClient {
   private defaultChainId: number | string;
   private account?: Account;
+  private walletClient?: WalletClient;
 
   /** Create a new Agora SDK client and validate the default chain. */
   constructor(config: AgoraClientConfig) {
     this.defaultChainId = config.defaultChainId;
     this.account = config.account;
+    this.walletClient = config.walletClient;
     getChainOrThrow(this.defaultChainId);
   }
 
@@ -31,12 +33,12 @@ export class AgoraClient {
 
   /** Deploy a new agent NFT and token-bound account on the selected chain. */
   async deployAgent(params: DeployAgentParams, chainId?: number | string) {
-    const account = this.requireAccount();
+    const signer = this.getSigner();
     const targetChainId = chainId ?? this.defaultChainId;
     const metadataURI = this.buildMetadataURI(params);
     const capabilityHash = this.hashCapabilities(params.capabilities);
 
-    return agentContract.deployAgent(targetChainId, account, {
+    return agentContract.deployAgent(targetChainId, signer, {
       metadataURI,
       capabilityHash,
       pricePerCallUsdc: params.pricePerCallUsdc,
@@ -45,7 +47,7 @@ export class AgoraClient {
 
   /** Hire an agent by creating and funding an escrow, optionally encrypting the task. */
   async hire(params: CreateEscrowParams, mediatorPublicKey?: Uint8Array): Promise<HireResult> {
-    const account = this.requireAccount();
+    const signer = this.getSigner();
     const chainId = params.chainId ?? this.defaultChainId;
     const taskHash = this.hashTask(params.taskDescription);
     let encryptedTaskBlob: Hex = '0x';
@@ -57,7 +59,7 @@ export class AgoraClient {
     }
 
     const deadline = BigInt(Math.floor(Date.now() / 1000) + params.deadlineDays * 86_400);
-    return escrowContract.createEscrow(chainId, account, {
+    return escrowContract.createEscrow(chainId, signer, {
       agentId: params.agentId,
       taskHash,
       amountUsdc: params.amountUsdc,
@@ -99,6 +101,12 @@ export class AgoraClient {
   private requireAccount(): Account {
     if (!this.account) throw new Error('No account set');
     return this.account;
+  }
+
+  private getSigner(): Account | WalletClient {
+    if (this.walletClient) return this.walletClient;
+    if (this.account) return this.account;
+    throw new Error('No account or wallet client set');
   }
 
   private buildMetadataURI(params: DeployAgentParams): string {

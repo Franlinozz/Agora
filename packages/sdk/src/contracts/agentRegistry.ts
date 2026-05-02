@@ -1,7 +1,7 @@
 
 import { getChainOrThrow } from '@agora/chains';
 import { ChainNotSupportedError, type Agent } from '@agora/shared';
-import { type Account, type Address, type Hash } from 'viem';
+import { type Account, type Address, type Hash, type WalletClient } from 'viem';
 
 import { agentRegistryAbi } from '../abis/index.ts';
 import { getPublicClient, getWalletClient } from '../clients/index.ts';
@@ -26,7 +26,7 @@ function registryAddress(chainId: number | string): Address {
 
 export async function deployAgent(
   chainId: number | string,
-  account: Account,
+  account: Account | WalletClient,
   params: { metadataURI: string; capabilityHash: Hash; pricePerCallUsdc: bigint },
 ): Promise<{ agentId: bigint; txHash: Hash }> {
   const wallet = getWalletClient(chainId, account);
@@ -36,7 +36,7 @@ export async function deployAgent(
     abi: agentRegistryAbi,
     functionName: 'deployAgent',
     args: [params.metadataURI, params.capabilityHash, params.pricePerCallUsdc],
-    account,
+    account: wallet.account ?? (account as Account),
     chain: null,
   });
   return { agentId, txHash };
@@ -44,7 +44,7 @@ export async function deployAgent(
 
 export async function updatePrice(
   chainId: number | string,
-  account: Account,
+  account: Account | WalletClient,
   agentId: bigint,
   newPrice: bigint,
 ): Promise<Hash> {
@@ -54,14 +54,14 @@ export async function updatePrice(
     abi: agentRegistryAbi,
     functionName: 'updatePrice',
     args: [agentId, newPrice],
-    account,
+    account: wallet.account ?? (account as Account),
     chain: null,
   });
 }
 
 export async function deactivateAgent(
   chainId: number | string,
-  account: Account,
+  account: Account | WalletClient,
   agentId: bigint,
 ): Promise<Hash> {
   const wallet = getWalletClient(chainId, account);
@@ -70,7 +70,7 @@ export async function deactivateAgent(
     abi: agentRegistryAbi,
     functionName: 'deactivateAgent',
     args: [agentId],
-    account,
+    account: wallet.account ?? (account as Account),
     chain: null,
   });
 }

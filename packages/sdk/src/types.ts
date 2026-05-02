@@ -1,10 +1,11 @@
 import type { AgentCapability } from '@agora/shared';
-import type { Account, Hash } from 'viem';
+import type { Account, Hash, WalletClient } from 'viem';
 
 
 export interface AgoraClientConfig {
   defaultChainId: number | string;
   account?: Account;
+  walletClient?: WalletClient;
 }
 
 export interface DeployAgentParams {

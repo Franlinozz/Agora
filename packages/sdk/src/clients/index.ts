@@ -19,10 +19,13 @@ export function getPublicClient(chainId: number | string): PublicClient {
   });
 }
 
-export function getWalletClient(chainId: number | string, account: Account): WalletClient {
+export function getWalletClient(chainId: number | string, accountOrWallet: Account | WalletClient): WalletClient {
+  if ('request' in accountOrWallet && typeof accountOrWallet.request === 'function') {
+    return accountOrWallet as WalletClient;
+  }
   const chain = getChainOrThrow(chainId);
   return createWalletClient({
-    account,
+    account: accountOrWallet as Account,
     chain: toViemChain(chain),
     transport: http(chain.rpcUrl),
   });

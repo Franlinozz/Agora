@@ -1,7 +1,7 @@
 
 import { getChainOrThrow } from '@agora/chains';
 import { ChainNotSupportedError, EscrowState, type Escrow } from '@agora/shared';
-import { erc20Abi, type Account, type Address, type Hash, type Hex } from 'viem';
+import { erc20Abi, type Account, type Address, type Hash, type Hex, type WalletClient } from 'viem';
 
 import { escrowManagerAbi } from '../abis/index.ts';
 import { getPublicClient, getWalletClient } from '../clients/index.ts';
@@ -34,7 +34,7 @@ function usdcAddress(chainId: number | string): Address {
 
 export async function createEscrow(
   chainId: number | string,
-  account: Account,
+  account: Account | WalletClient,
   params: {
     agentId: bigint;
     taskHash: Hash;
@@ -62,7 +62,7 @@ export async function createEscrow(
       abi: erc20Abi,
       functionName: 'approve',
       args: [spender, params.amountUsdc],
-      account,
+      account: wallet.account ?? (account as Account),
       chain: null,
     });
   }
@@ -80,7 +80,7 @@ export async function createEscrow(
       params.confidential,
       params.encryptedTaskBlob,
     ],
-    account,
+    account: wallet.account ?? (account as Account),
     chain: null,
   });
 
@@ -89,7 +89,7 @@ export async function createEscrow(
 
 export async function submitDelivery(
   chainId: number | string,
-  account: Account,
+  account: Account | WalletClient,
   escrowId: bigint,
   deliveryHash: Hash,
   encryptedDeliveryBlob: Hex = '0x',
@@ -100,14 +100,14 @@ export async function submitDelivery(
     abi: escrowManagerAbi,
     functionName: 'submitDelivery',
     args: [escrowId, deliveryHash, encryptedDeliveryBlob],
-    account,
+    account: wallet.account ?? (account as Account),
     chain: null,
   });
 }
 
 export async function verifyAndRelease(
   chainId: number | string,
-  account: Account,
+  account: Account | WalletClient,
   escrowId: bigint,
 ): Promise<Hash> {
   const wallet = getWalletClient(chainId, account);
@@ -116,14 +116,14 @@ export async function verifyAndRelease(
     abi: escrowManagerAbi,
     functionName: 'verifyAndRelease',
     args: [escrowId],
-    account,
+    account: wallet.account ?? (account as Account),
     chain: null,
   });
 }
 
 export async function dispute(
   chainId: number | string,
-  account: Account,
+  account: Account | WalletClient,
   escrowId: bigint,
   reason: string,
 ): Promise<Hash> {
@@ -133,14 +133,14 @@ export async function dispute(
     abi: escrowManagerAbi,
     functionName: 'dispute',
     args: [escrowId, reason],
-    account,
+    account: wallet.account ?? (account as Account),
     chain: null,
   });
 }
 
 export async function refundExpired(
   chainId: number | string,
-  account: Account,
+  account: Account | WalletClient,
   escrowId: bigint,
 ): Promise<Hash> {
   const wallet = getWalletClient(chainId, account);
@@ -149,7 +149,7 @@ export async function refundExpired(
     abi: escrowManagerAbi,
     functionName: 'refundExpired',
     args: [escrowId],
-    account,
+    account: wallet.account ?? (account as Account),
     chain: null,
   });
 }

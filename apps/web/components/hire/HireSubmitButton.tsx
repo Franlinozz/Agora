@@ -24,7 +24,7 @@ export function HireSubmitButton({ agentId, draft }: { agentId: string; draft: H
 
     setStatus('checking');
     try {
-      const client = new AgoraClient({ defaultChainId: Number(arcConfig.id), account: walletClient.account });
+      const client = new AgoraClient({ defaultChainId: Number(arcConfig.id), account: walletClient.account, walletClient });
       setStatus('pending');
       const result = await client.hire({
         agentId: BigInt(agentId),
