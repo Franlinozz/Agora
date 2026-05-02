@@ -53,7 +53,7 @@ export async function createEscrow(
     address: usdcAddress(chainId),
     abi: erc20Abi,
     functionName: 'allowance',
-    args: [account.address, spender],
+    args: [(wallet.account ?? (account as Account)).address, spender],
   })) as bigint;
 
   if (allowance < params.amountUsdc) {
