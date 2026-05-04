@@ -35,7 +35,7 @@ export function AnimateIn({
   duration = 0.6,
   as = 'div',
 }: AnimateInProps) {
-  const dir = directionMap[direction];
+  const dir = directionMap[direction] || directionMap.up;
   const variants: Variants = {
     hidden: {
       opacity: 0,
