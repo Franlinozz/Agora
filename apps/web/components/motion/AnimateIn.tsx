@@ -18,7 +18,7 @@ type AnimateInProps = {
   as?: 'div' | 'section' | 'article' | 'aside' | 'header' | 'footer' | 'span' | 'p' | 'h1' | 'h2' | 'h3';
 };
 
-const directionMap = {
+const directionMap: Record<string, { x?: number; y?: number }> = {
   up: { y: 1 },
   down: { y: -1 },
   left: { x: 1 },
