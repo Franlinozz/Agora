@@ -11,6 +11,7 @@ import { FilterSidebar } from '@/components/marketplace/FilterSidebar';
 import { MarketplaceGrid, type MarketplaceAgent } from '@/components/marketplace/MarketplaceGrid';
 import { SearchBar } from '@/components/marketplace/SearchBar';
 import { SortDropdown } from '@/components/marketplace/SortDropdown';
+import { AnimateIn } from '@/components/motion/AnimateIn';
 
 const PAGE_SIZE = 24;
 
@@ -54,52 +55,56 @@ function AgentsPageContent() {
   return (
     <section className="px-4 py-10 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
-        <div className="mb-8 grid gap-5 lg:grid-cols-[1fr_auto] lg:items-end">
-          <div>
-            <p className="font-mono text-xs uppercase tracking-[0.26em] text-[var(--color-arc-purple-light)]">{'//Marketplace'}</p>
-            <h1 className="mt-3 text-4xl font-semibold tracking-tight md:text-5xl">Hire agents with verifiable work history.</h1>
-            <p className="mt-4 max-w-2xl text-[var(--color-text-secondary)]">Search autonomous agents across Arc and Base, filter by capability or reputation, then fund work through USDC escrow.</p>
+        <AnimateIn direction="up" distance={24}>
+          <div className="mb-8 grid gap-5 lg:grid-cols-[1fr_auto] lg:items-end">
+            <div>
+              <p className="font-mono text-xs uppercase tracking-[0.26em] text-[var(--color-arc-purple-light)]">{'//Marketplace'}</p>
+              <h1 className="mt-3 text-4xl font-semibold tracking-tight md:text-5xl">Hire agents with verifiable work history.</h1>
+              <p className="mt-4 max-w-2xl text-[var(--color-text-secondary)]">Search autonomous agents across Arc and Base, filter by capability or reputation, then fund work through USDC escrow.</p>
+            </div>
+            <Button variant="secondary" className="w-fit lg:hidden" onClick={() => setMobileFiltersOpen((open) => !open)}>
+              <SlidersHorizontal className="size-4" /> Filters
+            </Button>
           </div>
-          <Button variant="secondary" className="w-fit lg:hidden" onClick={() => setMobileFiltersOpen((open) => !open)}>
-            <SlidersHorizontal className="size-4" /> Filters
-          </Button>
-        </div>
+        </AnimateIn>
 
-        <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
-          <aside className={cn('lg:block', mobileFiltersOpen ? 'block' : 'hidden')}>
-            <FilterSidebar onChange={() => setPage(1)} />
-          </aside>
-          <div className="min-w-0 space-y-5">
-            <Card>
-              <CardContent className="grid gap-4 p-4 md:grid-cols-[1fr_auto] md:items-center">
-                <SearchBar onSearch={() => setPage(1)} />
-                <SortDropdown onSort={() => setPage(1)} />
-              </CardContent>
-            </Card>
-
-            {error ? (
-              <Card variant="outlined">
-                <CardContent className="py-12 text-center">
-                  <h2 className="text-xl font-semibold">Could not load marketplace</h2>
-                  <p className="mt-2 text-sm text-[var(--color-text-secondary)]">The indexer API is not available yet. Try again once the VM gateway is online.</p>
+        <AnimateIn direction="up" distance={20} delay={0.15}>
+          <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
+            <aside className={cn('lg:block', mobileFiltersOpen ? 'block' : 'hidden')}>
+              <FilterSidebar onChange={() => setPage(1)} />
+            </aside>
+            <div className="min-w-0 space-y-5">
+              <Card>
+                <CardContent className="grid gap-4 p-4 md:grid-cols-[1fr_auto] md:items-center">
+                  <SearchBar onSearch={() => setPage(1)} />
+                  <SortDropdown onSort={() => setPage(1)} />
                 </CardContent>
               </Card>
-            ) : (
-              <MarketplaceGrid agents={agents} loading={isLoading} onClearFilters={clearFilters} hasFilters={hasFilters} />
-            )}
 
-            {!isLoading && !error ? (
-              <div className="flex flex-col items-center gap-3 py-4">
-                <p className="text-sm text-[var(--color-text-tertiary)]">Showing {agents.length} of {total} agents</p>
-                {canLoadMore ? (
-                  <Button variant="secondary" loading={isFetching} onClick={() => setPage((current) => current + 1)}>
-                    Load more
-                  </Button>
-                ) : null}
-              </div>
-            ) : null}
+              {error ? (
+                <Card variant="outlined">
+                  <CardContent className="py-12 text-center">
+                    <h2 className="text-xl font-semibold">Could not load marketplace</h2>
+                    <p className="mt-2 text-sm text-[var(--color-text-secondary)]">The indexer API is not available yet. Try again once the VM gateway is online.</p>
+                  </CardContent>
+                </Card>
+              ) : (
+                <MarketplaceGrid agents={agents} loading={isLoading} onClearFilters={clearFilters} hasFilters={hasFilters} />
+              )}
+
+              {!isLoading && !error ? (
+                <div className="flex flex-col items-center gap-3 py-4">
+                  <p className="text-sm text-[var(--color-text-tertiary)]">Showing {agents.length} of {total} agents</p>
+                  {canLoadMore ? (
+                    <Button variant="secondary" loading={isFetching} onClick={() => setPage((current) => current + 1)}>
+                      Load more
+                    </Button>
+                  ) : null}
+                </div>
+              ) : null}
+            </div>
           </div>
-        </div>
+        </AnimateIn>
       </div>
     </section>
   );

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 
 import { Button, Input, toast } from '@agora/ui';
+import { AnimateIn } from '@/components/motion/AnimateIn';
 
 export function SubscribeBand() {
   const [email, setEmail] = useState('');
@@ -24,7 +25,7 @@ export function SubscribeBand() {
   }
 
   return (
-    <section className="mx-auto my-12 w-full max-w-6xl px-4">
+    <AnimateIn as="section" direction="up" distance={36} className="mx-auto my-12 w-full max-w-6xl px-4">
       <form onSubmit={subscribe} className="grid gap-4 rounded-2xl border border-[var(--color-bg-3)] bg-gradient-to-r from-[var(--color-arc-purple-deep)] via-[var(--color-arc-purple)] to-[var(--color-info)] p-6 shadow-[0_12px_32px_rgba(0,0,0,0.45)] md:grid-cols-[1fr_auto] md:items-end">
         <div>
           <p className="mb-2 font-mono text-xs uppercase tracking-[0.26em] text-white/75">{'//Subscribe for updates'}</p>
@@ -37,6 +38,6 @@ export function SubscribeBand() {
           </Button>
         </div>
       </form>
-    </section>
+    </AnimateIn>
   );
 }

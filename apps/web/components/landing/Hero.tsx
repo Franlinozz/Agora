@@ -65,7 +65,7 @@ export function Hero() {
   };
 
   return (
-    <section className="relative overflow-hidden px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
+    <section className="relative overflow-hidden px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
       <div className="absolute inset-0 bg-gradient-to-b from-[var(--color-bg-1)] to-[var(--color-bg-0)] -z-10" />
       <div className="mx-auto grid max-w-7xl items-center gap-14 lg:grid-cols-[1.08fr_0.92fr]">
         <motion.div variants={containerVariants} initial="hidden" animate="visible">
