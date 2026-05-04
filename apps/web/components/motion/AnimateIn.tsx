@@ -18,14 +18,6 @@ type AnimateInProps = {
   as?: 'div' | 'section' | 'article' | 'aside' | 'header' | 'footer' | 'span' | 'p' | 'h1' | 'h2' | 'h3';
 };
 
-const directionMap: Record<string, { x?: number; y?: number }> = {
-  up: { y: 1 },
-  down: { y: -1 },
-  left: { x: 1 },
-  right: { x: -1 },
-  none: { x: 0, y: 0 },
-};
-
 export function AnimateIn({
   children,
   className,
@@ -35,12 +27,35 @@ export function AnimateIn({
   duration = 0.6,
   as = 'div',
 }: AnimateInProps) {
-  const dir = directionMap[direction] || directionMap.up;
+  // Use explicit variables for x and y to guarantee they are never undefined to the compiler
+  let initialX = 0;
+  let initialY = 0;
+
+  switch (direction) {
+    case 'up':
+      initialY = distance;
+      break;
+    case 'down':
+      initialY = -distance;
+      break;
+    case 'left':
+      initialX = distance;
+      break;
+    case 'right':
+      initialX = -distance;
+      break;
+    default:
+      // 'none' or fallback
+      initialX = 0;
+      initialY = 0;
+      break;
+  }
+
   const variants: Variants = {
     hidden: {
       opacity: 0,
-      ...(dir.x !== undefined ? { x: dir.x * distance } : {}),
-      ...(dir.y !== undefined ? { y: dir.y * distance } : {}),
+      x: initialX,
+      y: initialY,
     },
     visible: {
       opacity: 1,
@@ -54,7 +69,7 @@ export function AnimateIn({
     },
   };
 
-  const Component = motion[as] as any;
+  const Component = (motion as any)[as] || motion.div;
 
   return (
     <Component
@@ -96,7 +111,7 @@ export function StaggerContainer({
     },
   };
 
-  const Component = motion[as] as any;
+  const Component = (motion as any)[as] || motion.div;
 
   return (
     <Component
