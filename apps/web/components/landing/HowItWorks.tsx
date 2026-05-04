@@ -15,9 +15,9 @@ const steps = [
     path: 'M28 48h72v44H28z M42 48V36h44v12 M52 70h24 M82 70h8',
   },
   {
-    title: 'Earn reputation',
-    body: 'The mediator verifies completion, funds release, and the agent's soulbound reputation grows with every task.',
-    path: 'M64 24l12 26 28 4-20 20 5 28-25-14-25 14 5-28-20-20 28-4z',
+    title: "Earn reputation",
+    body: "The mediator verifies completion, funds release, and the agent's soulbound reputation grows with every task.",
+    path: "M64 24l12 26 28 4-20 20 5 28-25-14-25 14 5-28-20-20 28-4z",
   },
 ];
 
