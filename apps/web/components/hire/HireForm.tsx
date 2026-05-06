@@ -17,12 +17,13 @@ export type HireDraft = {
   milestones: MilestoneDraft[];
 };
 
-export function HireForm({ agentId }: { agentId: string }) {
+export function HireForm({ agentId, onchainAgentId, agentName, chainId, pricePerCallUsdc }: { agentId: string; onchainAgentId: string; agentName: string; chainId: number; pricePerCallUsdc: string }) {
+  const defaultAmount = formatUsdcAmount(pricePerCallUsdc);
   const [draft, setDraft] = useState<HireDraft>({
     taskDescription: '',
     confidential: false,
     deadlineDays: '7',
-    amountUsdc: '1.00',
+    amountUsdc: defaultAmount,
     milestones: [],
   });
   const [error, setError] = useState('');
@@ -50,7 +51,7 @@ export function HireForm({ agentId }: { agentId: string }) {
         <CardContent className="grid gap-6 p-6">
           <div>
             <h2 className="text-2xl font-semibold">Task details</h2>
-            <p className="mt-2 text-[var(--color-text-secondary)]">Agent #{agentId}. Write clear acceptance criteria so the mediator can verify completion.</p>
+            <p className="mt-2 text-[var(--color-text-secondary)]">{agentName} · onchain agent #{onchainAgentId}. Write clear acceptance criteria so the mediator can verify completion.</p>
           </div>
 
           <label className="grid gap-2 text-[13px] text-[var(--color-text-secondary)]">
@@ -99,9 +100,15 @@ export function HireForm({ agentId }: { agentId: string }) {
         </Card>
       </aside>
 
-      <ConfirmDialog open={confirmOpen} onOpenChange={setConfirmOpen} agentId={agentId} draft={draft} />
+      <ConfirmDialog open={confirmOpen} onOpenChange={setConfirmOpen} agentId={agentId} onchainAgentId={onchainAgentId} chainId={chainId} draft={draft} />
     </div>
   );
+}
+
+function formatUsdcAmount(amount: string): string {
+  const micros = Number.parseInt(amount, 10);
+  if (!Number.isFinite(micros) || micros <= 0) return '0.001';
+  return (micros / 1_000_000).toFixed(6).replace(/0+$/, '').replace(/\.$/, '');
 }
 
 function validateDraft(draft: HireDraft): true | string {

@@ -7,7 +7,9 @@ import { AddressLink, AgentAvatar, Badge, Button, Card, CardContent, ChainBadge,
 
 export type AgentDetail = {
   id: string;
+  onchainId: string;
   chainId: number;
+  chainKey: string;
   name: string;
   description: string;
   deployer: `0x${string}`;
@@ -68,7 +70,7 @@ export function AgentHeader({ agent }: { agent: AgentDetail }) {
             <button type="button" onClick={copyTba} className="inline-flex items-center gap-1 text-[var(--color-info)] hover:underline">
               Agent wallet <span className="font-mono">{agent.tbaAddress.slice(0, 6)}...{agent.tbaAddress.slice(-4)}</span> <Copy className="size-3.5" />
             </button>
-            <Link href={`/agents/${agent.id}`} className="inline-flex items-center gap-1 text-[var(--color-info)] no-underline hover:underline">Canonical profile <ExternalLink className="size-3.5" /></Link>
+            <Link href={`/agents/${agent.id}`} className="inline-flex items-center gap-1 text-[var(--color-info)] no-underline hover:underline">Canonical profile #{agent.onchainId} <ExternalLink className="size-3.5" /></Link>
           </div>
         </div>
       </CardContent>

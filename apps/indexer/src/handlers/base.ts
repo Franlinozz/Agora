@@ -1,10 +1,10 @@
 import { getChainOrThrow } from '@agora/chains';
 import { agentRegistryAbi, escrowManagerAbi, reputationOracleAbi } from '@agora/sdk';
 import { and, eq, lte } from 'drizzle-orm';
-import { createPublicClient, http, type Log } from 'viem';
+import { createPublicClient, http, type Abi, type Address, type Log } from 'viem';
 
 import { db } from '../db/client.ts';
-import { events } from '../db/schema.ts';
+import { chains, events } from '../db/schema.ts';
 import { backfill, setLastIndexedBlock } from '../lib/backfill.ts';
 import { assertHexAddress } from '../lib/event-decoder.ts';
 import { logger } from '../lib/logger.ts';
@@ -14,6 +14,7 @@ import * as handlers from './shared.ts';
 
 const BASE_CHAIN_ID = '8453';
 const BASE_CONFIRMATIONS = 5n;
+const BASE_DEPLOYMENT_START_BLOCK = BigInt(process.env.BASE_INDEXER_START_BLOCK ?? '45659285');
 
 type DecodedLog = Log & {
   eventName?: string;
@@ -46,20 +47,15 @@ export async function startBaseIndexer(): Promise<void> {
   const currentHead = await withRpcBackoff(`${BASE_CHAIN_ID}:getBlockNumber`, () =>
     client.getBlockNumber(),
   );
+  await seedBaseStartBlockIfNeeded();
+
+  const subscriptions: Array<{ name: string; address: Address; abi: Abi }> = [];
 
   if (agentRegistryAddress) {
     await backfill(BASE_CHAIN_ID, client, agentRegistryAddress, agentRegistryAbi, handleBackfillLog, {
       updateProgress: false,
     });
-    client.watchContractEvent({
-      address: agentRegistryAddress,
-      abi: agentRegistryAbi,
-      onLogs: (logs) => void Promise.all(logs.map((log) => handleAny(BASE_CHAIN_ID, log))),
-      onError: (error) =>
-        logger.error({ error, chain: BASE_CHAIN_ID }, 'Base AgentRegistry watcher failed'),
-      poll: true,
-      pollingInterval: 5_000,
-    });
+    subscriptions.push({ name: 'AgentRegistry', address: agentRegistryAddress, abi: agentRegistryAbi });
   } else {
     logger.warn({ chain: BASE_CHAIN_ID }, 'AgentRegistry address missing; skipping indexer');
   }
@@ -68,15 +64,7 @@ export async function startBaseIndexer(): Promise<void> {
     await backfill(BASE_CHAIN_ID, client, escrowManagerAddress, escrowManagerAbi, handleBackfillLog, {
       updateProgress: false,
     });
-    client.watchContractEvent({
-      address: escrowManagerAddress,
-      abi: escrowManagerAbi,
-      onLogs: (logs) => void Promise.all(logs.map((log) => handleAny(BASE_CHAIN_ID, log))),
-      onError: (error) =>
-        logger.error({ error, chain: BASE_CHAIN_ID }, 'Base EscrowManager watcher failed'),
-      poll: true,
-      pollingInterval: 5_000,
-    });
+    subscriptions.push({ name: 'EscrowManager', address: escrowManagerAddress, abi: escrowManagerAbi });
   } else {
     logger.warn({ chain: BASE_CHAIN_ID }, 'EscrowManager address missing; skipping indexer');
   }
@@ -90,23 +78,58 @@ export async function startBaseIndexer(): Promise<void> {
       handleBackfillLog,
       { updateProgress: false },
     );
-    client.watchContractEvent({
-      address: reputationOracleAddress,
-      abi: reputationOracleAbi,
-      onLogs: (logs) => void Promise.all(logs.map((log) => handleAny(BASE_CHAIN_ID, log))),
-      onError: (error) =>
-        logger.error({ error, chain: BASE_CHAIN_ID }, 'Base ReputationOracle watcher failed'),
-      poll: true,
-      pollingInterval: 5_000,
-    });
+    subscriptions.push({ name: 'ReputationOracle', address: reputationOracleAddress, abi: reputationOracleAbi });
   } else {
     logger.warn({ chain: BASE_CHAIN_ID }, 'ReputationOracle address missing; skipping indexer');
   }
 
   await setLastIndexedBlock(BASE_CHAIN_ID, currentHead);
+  setInterval(() => void pollBaseEvents(client, subscriptions), 10_000);
   setInterval(() => void confirmFinalizedEvents(client), 5_000);
 
   logger.info({ chain: BASE_CHAIN_ID }, 'Indexer subscribed');
+}
+
+async function pollBaseEvents(
+  client: ReturnType<typeof createPublicClient>,
+  subscriptions: Array<{ name: string; address: Address; abi: Abi }>,
+): Promise<void> {
+  try {
+    const head = await withRpcBackoff(`${BASE_CHAIN_ID}:poll:getBlockNumber`, () =>
+      client.getBlockNumber(),
+    );
+    const existing = await db.query.chains.findFirst({ where: eq(chains.id, BASE_CHAIN_ID) });
+    const lastIndexedBlock = existing?.lastIndexedBlock ?? 0n;
+
+    if (head <= lastIndexedBlock) return;
+
+    for (const subscription of subscriptions) {
+      await backfill(
+        BASE_CHAIN_ID,
+        client,
+        subscription.address,
+        subscription.abi,
+        handleBackfillLog,
+        { updateProgress: false },
+      );
+    }
+
+    await setLastIndexedBlock(BASE_CHAIN_ID, head);
+    logger.debug({ chain: BASE_CHAIN_ID, toBlock: head }, 'Base poll complete');
+  } catch (error) {
+    logger.error({ error, chain: BASE_CHAIN_ID }, 'Base poll failed');
+  }
+}
+
+async function seedBaseStartBlockIfNeeded(): Promise<void> {
+  const existing = await db.query.chains.findFirst({ where: eq(chains.id, BASE_CHAIN_ID) });
+  if (!existing || existing.lastIndexedBlock === 0n) {
+    await setLastIndexedBlock(BASE_CHAIN_ID, BASE_DEPLOYMENT_START_BLOCK);
+    logger.info(
+      { chain: BASE_CHAIN_ID, lastIndexedBlock: BASE_DEPLOYMENT_START_BLOCK },
+      'Seeded Base indexer start block',
+    );
+  }
 }
 
 async function confirmFinalizedEvents(

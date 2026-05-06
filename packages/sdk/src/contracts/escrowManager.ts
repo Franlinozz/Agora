@@ -65,6 +65,7 @@ export async function createEscrow(
       account: wallet.account ?? (account as Account),
       chain: null,
     });
+    await client.waitForTransactionReceipt({ hash: approvalTxHash });
   }
 
   const nextEscrowId = ((await totalEscrows(chainId)) as bigint) + 1n;

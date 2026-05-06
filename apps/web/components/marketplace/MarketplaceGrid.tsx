@@ -31,8 +31,12 @@ export function getAgentDisplayId(agent: MarketplaceAgent): string {
   return agent.id ?? agent.onchainId ?? String(agent.pk ?? '0');
 }
 
+function getAgentProfileId(agent: MarketplaceAgent): string {
+  return String(agent.pk ?? getAgentDisplayId(agent));
+}
+
 function normalizeAgent(agent: MarketplaceAgent): Agent {
-  const id = getAgentDisplayId(agent);
+  const id = getAgentProfileId(agent);
   const tbaAddress = agent.tbaAddress ?? agent.tba ?? '0x0000000000000000000000000000000000000000';
 
   return {
@@ -53,7 +57,7 @@ function normalizeReputation(agent: MarketplaceAgent): Reputation | undefined {
   if (!agent.reputation) return undefined;
   return {
     ...agent.reputation,
-    agentId: BigInt(getAgentDisplayId(agent)),
+    agentId: BigInt(getAgentProfileId(agent)),
     totalEarningsUsdc: BigInt(agent.reputation.totalEarningsUsdc),
     lastUpdated: new Date(agent.reputation.lastUpdated),
   };
@@ -104,7 +108,7 @@ export function MarketplaceGrid({ agents, loading, onClearFilters, hasFilters }:
 
   return (
     <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-      {agents.map((agent) => <AgentCard key={`${agent.chainId}-${getAgentDisplayId(agent)}`} agent={normalizeAgent(agent)} reputation={normalizeReputation(agent)} />)}
+      {agents.map((agent) => <AgentCard key={`${agent.chainId}-${getAgentProfileId(agent)}`} agent={normalizeAgent(agent)} reputation={normalizeReputation(agent)} />)}
     </div>
   );
 }

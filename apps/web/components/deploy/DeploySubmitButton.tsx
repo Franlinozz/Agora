@@ -47,7 +47,7 @@ export function DeploySubmitButton({ data, capabilities }: { data: DeployFormDat
       setTxHash(result.txHash);
       setStatus('confirmed');
       toast.success('Agent deployed. Redirecting to profile.');
-      router.push(`/agents/${result.agentId.toString()}`);
+      router.push(`/agents/${data.chainId}:${result.agentId.toString()}`);
     } catch (error) {
       console.error(error);
       const message = error instanceof Error ? error.message : 'Deploy failed. Check wallet, chain, and contract addresses.';

@@ -42,7 +42,7 @@ async function fetchAgents(): Promise<AgentsResponse> {
 
 function normalizeAgent(agent: IndexedAgent): MyAgent {
   return {
-    id: agent.id ?? agent.onchainId ?? String(agent.pk ?? '0'),
+    id: String(agent.pk ?? agent.id ?? agent.onchainId ?? '0'),
     name: agent.name,
     description: agent.description,
     tbaAddress: agent.tbaAddress ?? agent.tba ?? '0x0000000000000000000000000000000000000000',
@@ -109,6 +109,9 @@ function AgentManagementCard({ agent }: { agent: MyAgent }) {
           <Metric label="Earnings" value={<UsdcAmount amount={agent.earningsUsdc} />} />
           <Metric label="Price" value={<UsdcAmount amount={agent.priceUsdc} />} />
           <Metric label="Pending" value={String(agent.pendingTasks)} />
+        </div>
+        <div className="flex flex-wrap gap-3">
+          <Button asChild variant="secondary"><Link href={`/agents/${agent.id}`} className="no-underline">View profile</Link></Button>
         </div>
         <Modal.Root>
           <Modal.Trigger asChild><Button variant="secondary"><Settings className="size-4" /> Manage</Button></Modal.Trigger>
