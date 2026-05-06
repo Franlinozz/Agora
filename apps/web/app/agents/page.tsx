@@ -44,7 +44,7 @@ function AgentsPageContent() {
 
   const hasFilters = useMemo(() => Array.from(searchParams.keys()).some((key) => key !== 'sort'), [searchParams]);
   const agents = data?.agents ?? [];
-  const total = data?.total ?? 0;
+  const total = data?.total ?? agents.length;
   const canLoadMore = agents.length < total;
 
   function clearFilters() {

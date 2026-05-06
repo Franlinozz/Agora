@@ -1,18 +1,33 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Button, Card, CardContent, Tabs } from '@agora/ui';
-import { AgentRanking } from '@/components/leaderboard/AgentRanking';
+import { AgentRanking, type LeaderboardEntry } from '@/components/leaderboard/AgentRanking';
 import { DeployerRanking } from '@/components/leaderboard/DeployerRanking';
 import { TaskRanking } from '@/components/leaderboard/TaskRanking';
 import { TimeRangeFilter, type TimeRange } from '@/components/leaderboard/TimeRangeFilter';
 import { AnimateIn } from '@/components/motion/AnimateIn';
 
+type LeaderboardResponse = {
+  entries: LeaderboardEntry[];
+};
+
+async function fetchLeaderboard(): Promise<LeaderboardResponse> {
+  const response = await fetch('/api/leaderboard?limit=50');
+  if (!response.ok) throw new Error('Could not load leaderboard');
+  return response.json() as Promise<LeaderboardResponse>;
+}
+
 export default function LeaderboardPage() {
   const [range, setRange] = useState<TimeRange>('all');
-  const [topAgent] = useState({ name: 'Agora Genesis Agent', earned: '0' });
+  const { data, isLoading } = useQuery({ queryKey: ['leaderboard', range], queryFn: fetchLeaderboard });
+  const entries = data?.entries ?? [];
+  const topAgent = entries[0]?.agent;
   const shareUrl = useMemo(() => {
-    const text = `Just checked the @AgoraProtocol leaderboard. ${topAgent.name} is #1 with $${topAgent.earned} earned.`;
+    const text = topAgent
+      ? `Just checked the @AgoraProtocol leaderboard. ${topAgent.name} is #1 on Agora.`
+      : 'Just checked the @AgoraProtocol leaderboard.';
     return `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
   }, [topAgent]);
 
@@ -26,7 +41,7 @@ export default function LeaderboardPage() {
           </div>
         </AnimateIn>
         <AnimateIn direction="up" distance={20} delay={0.15}>
-          <Card><CardContent><Tabs.Root defaultValue="agents"><Tabs.List><Tabs.Trigger value="agents">Top agents</Tabs.Trigger><Tabs.Trigger value="deployers">Top deployers</Tabs.Trigger><Tabs.Trigger value="tasks">Biggest tasks</Tabs.Trigger></Tabs.List><Tabs.Content value="agents" className="pt-5"><AgentRanking range={range} /></Tabs.Content><Tabs.Content value="deployers" className="pt-5"><DeployerRanking range={range} /></Tabs.Content><Tabs.Content value="tasks" className="pt-5"><TaskRanking range={range} /></Tabs.Content></Tabs.Root></CardContent></Card>
+          <Card><CardContent><Tabs.Root defaultValue="agents"><Tabs.List><Tabs.Trigger value="agents">Top agents</Tabs.Trigger><Tabs.Trigger value="deployers">Top deployers</Tabs.Trigger><Tabs.Trigger value="tasks">Biggest tasks</Tabs.Trigger></Tabs.List><Tabs.Content value="agents" className="pt-5"><AgentRanking range={range} entries={entries} loading={isLoading} /></Tabs.Content><Tabs.Content value="deployers" className="pt-5"><DeployerRanking range={range} /></Tabs.Content><Tabs.Content value="tasks" className="pt-5"><TaskRanking range={range} /></Tabs.Content></Tabs.Root></CardContent></Card>
         </AnimateIn>
       </div>
     </section>

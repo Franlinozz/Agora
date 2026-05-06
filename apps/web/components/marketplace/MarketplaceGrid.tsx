@@ -4,15 +4,18 @@ import { Bot } from 'lucide-react';
 import { AgentCard, Button, Card, CardContent, EmptyState, Skeleton } from '@agora/ui';
 
 export type MarketplaceAgent = {
-  id: string;
-  chainId: number;
+  id?: string;
+  pk?: number;
+  onchainId?: string;
+  chainId: number | string;
   deployer: `0x${string}`;
-  tbaAddress: `0x${string}`;
+  tbaAddress?: `0x${string}`;
+  tba?: `0x${string}`;
   name: string;
   description: string;
   capabilityHash: `0x${string}`;
   pricePerCallUsdc: string;
-  modelProvider: 'openai' | 'anthropic' | 'custom';
+  modelProvider?: 'openai' | 'anthropic' | 'custom';
   createdAt: string;
   reputation?: {
     completedTasks: number;
@@ -21,14 +24,27 @@ export type MarketplaceAgent = {
     totalEarningsUsdc: string;
     weightedScore: number;
     lastUpdated: string;
-  };
+  } | null;
 };
 
+export function getAgentDisplayId(agent: MarketplaceAgent): string {
+  return agent.id ?? agent.onchainId ?? String(agent.pk ?? '0');
+}
+
 function normalizeAgent(agent: MarketplaceAgent): Agent {
+  const id = getAgentDisplayId(agent);
+  const tbaAddress = agent.tbaAddress ?? agent.tba ?? '0x0000000000000000000000000000000000000000';
+
   return {
-    ...agent,
-    id: BigInt(agent.id),
-    pricePerCallUsdc: BigInt(agent.pricePerCallUsdc),
+    id: BigInt(id),
+    chainId: agent.chainId as Agent['chainId'],
+    deployer: agent.deployer,
+    tbaAddress,
+    name: agent.name,
+    description: agent.description,
+    capabilityHash: agent.capabilityHash,
+    pricePerCallUsdc: BigInt(agent.pricePerCallUsdc ?? '0'),
+    modelProvider: agent.modelProvider ?? 'custom',
     createdAt: new Date(agent.createdAt),
   };
 }
@@ -37,7 +53,7 @@ function normalizeReputation(agent: MarketplaceAgent): Reputation | undefined {
   if (!agent.reputation) return undefined;
   return {
     ...agent.reputation,
-    agentId: BigInt(agent.id),
+    agentId: BigInt(getAgentDisplayId(agent)),
     totalEarningsUsdc: BigInt(agent.reputation.totalEarningsUsdc),
     lastUpdated: new Date(agent.reputation.lastUpdated),
   };
@@ -88,7 +104,7 @@ export function MarketplaceGrid({ agents, loading, onClearFilters, hasFilters }:
 
   return (
     <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-      {agents.map((agent) => <AgentCard key={`${agent.chainId}-${agent.id}`} agent={normalizeAgent(agent)} reputation={normalizeReputation(agent)} />)}
+      {agents.map((agent) => <AgentCard key={`${agent.chainId}-${getAgentDisplayId(agent)}`} agent={normalizeAgent(agent)} reputation={normalizeReputation(agent)} />)}
     </div>
   );
 }
