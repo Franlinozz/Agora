@@ -11,10 +11,13 @@ import {
   zerionWallet,
 } from '@rainbow-me/rainbowkit/wallets';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Attribution } from 'ox/erc8021';
 import React from 'react';
 import { createConfig, http, WagmiProvider } from 'wagmi';
 
 const queryClient = new QueryClient();
+const baseBuilderCode = process.env.NEXT_PUBLIC_BASE_BUILDER_CODE;
+const dataSuffix = baseBuilderCode ? Attribution.toDataSuffix({ codes: [baseBuilderCode] }) : undefined;
 
 export function WalletProvider({ children, walletConnectProjectId }: { children: React.ReactNode; walletConnectProjectId: string }) {
   const evmChains = ACTIVE_CHAINS.filter((chain) => chain.kind === 'evm' && typeof chain.id === 'number').map((chain) => ({
@@ -39,6 +42,7 @@ export function WalletProvider({ children, walletConnectProjectId }: { children:
     chains: evmChains as never,
     connectors,
     transports: Object.fromEntries(evmChains.map((chain) => [chain.id, http(chain.rpcUrls.default.http[0])])) as never,
+    ...(dataSuffix ? { dataSuffix } : {}),
   });
 
   return (

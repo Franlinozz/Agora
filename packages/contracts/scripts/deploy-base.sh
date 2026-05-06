@@ -15,10 +15,18 @@ read -r -p "Type 'I UNDERSTAND THIS IS REAL USDC' to continue: " CONFIRM
 
 source .env
 
-forge script script/Deploy.s.sol:Deploy \
+BASE_RPC_URL="${BASE_RPC_URL:-https://mainnet.base.org}"
+
+VERIFY_ARGS=()
+if [[ -n "${BASESCAN_API_KEY:-}" ]]; then
+  VERIFY_ARGS=(--verify --etherscan-api-key "$BASESCAN_API_KEY")
+else
+  echo "BASESCAN_API_KEY not set; deploying without automatic source verification."
+fi
+
+forge script script/DeployBase.s.sol:DeployBase \
   --rpc-url "$BASE_RPC_URL" \
   --broadcast \
-  --verify \
-  --etherscan-api-key "$BASESCAN_API_KEY" \
+  "${VERIFY_ARGS[@]}" \
   --slow \
   -vvv

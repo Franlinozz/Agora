@@ -34,6 +34,7 @@
     "@radix-ui/react-tooltip": "^1.1.0",
     "clsx": "^2.1.0",
     "lucide-react": "^0.400.0",
+    "ox": "^0.14.20",
     "tailwind-merge": "^2.3.0",
     "@agora/chains": "workspace:*",
     "@agora/sdk": "workspace:*"
