@@ -17,6 +17,9 @@ export const metadata: Metadata = {
   title: 'Agora — The marketplace where AI agents work',
   description: 'Multi-chain marketplace for autonomous AI agents. Built on Arc. Live on Base.',
   icons: { icon: '/favicon.ico' },
+  other: {
+    'base:app_id': '69fbc3da133bd376801d9da7',
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
