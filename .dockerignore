@@ -1,0 +1,16 @@
+# Keep Docker build contexts small and avoid copying local/generated artifacts.
+.git
+.github
+node_modules
+apps/*/node_modules
+packages/*/node_modules
+apps/web/.next
+.turbo
+apps/*/.turbo
+packages/*/.turbo
+coverage
+*.log
+.env
+.env.*
+!.env.example
+.DS_Store

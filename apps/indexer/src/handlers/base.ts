@@ -57,6 +57,7 @@ export async function startBaseIndexer(): Promise<void> {
       onLogs: (logs) => void Promise.all(logs.map((log) => handleAny(BASE_CHAIN_ID, log))),
       onError: (error) =>
         logger.error({ error, chain: BASE_CHAIN_ID }, 'Base AgentRegistry watcher failed'),
+      poll: true,
       pollingInterval: 5_000,
     });
   } else {
@@ -73,6 +74,7 @@ export async function startBaseIndexer(): Promise<void> {
       onLogs: (logs) => void Promise.all(logs.map((log) => handleAny(BASE_CHAIN_ID, log))),
       onError: (error) =>
         logger.error({ error, chain: BASE_CHAIN_ID }, 'Base EscrowManager watcher failed'),
+      poll: true,
       pollingInterval: 5_000,
     });
   } else {
@@ -94,6 +96,7 @@ export async function startBaseIndexer(): Promise<void> {
       onLogs: (logs) => void Promise.all(logs.map((log) => handleAny(BASE_CHAIN_ID, log))),
       onError: (error) =>
         logger.error({ error, chain: BASE_CHAIN_ID }, 'Base ReputationOracle watcher failed'),
+      poll: true,
       pollingInterval: 5_000,
     });
   } else {
@@ -101,7 +104,6 @@ export async function startBaseIndexer(): Promise<void> {
   }
 
   await setLastIndexedBlock(BASE_CHAIN_ID, currentHead);
-
   setInterval(() => void confirmFinalizedEvents(client), 5_000);
 
   logger.info({ chain: BASE_CHAIN_ID }, 'Indexer subscribed');

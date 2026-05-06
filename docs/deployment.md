@@ -80,6 +80,7 @@ cd /opt/agora
 Create `/opt/agora/.env` from `.env.example` and fill production values. Critical VM-only secrets include:
 
 - `POSTGRES_PASSWORD`
+- `POSTGRES_PASSWORD_URLENCODED` — URL-encoded version of `POSTGRES_PASSWORD`, required by Docker Compose service `DATABASE_URL` values
 - `API_GATEWAY_SECRET`
 - `DAEMON_MASTER_KEY`
 - `OPENAI_API_KEY`

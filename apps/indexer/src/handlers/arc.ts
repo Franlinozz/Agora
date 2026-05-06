@@ -50,6 +50,7 @@ export async function startArcIndexer(): Promise<void> {
       onLogs: (logs) => void Promise.all(logs.map((log) => handleAny(ARC_CHAIN_ID, log))),
       onError: (error) =>
         logger.error({ error, chain: ARC_CHAIN_ID }, 'AgentRegistry watcher failed'),
+      poll: true,
       pollingInterval: 2_000,
     });
   } else {
@@ -66,6 +67,7 @@ export async function startArcIndexer(): Promise<void> {
       onLogs: (logs) => void Promise.all(logs.map((log) => handleAny(ARC_CHAIN_ID, log))),
       onError: (error) =>
         logger.error({ error, chain: ARC_CHAIN_ID }, 'EscrowManager watcher failed'),
+      poll: true,
       pollingInterval: 2_000,
     });
   } else {
@@ -87,6 +89,7 @@ export async function startArcIndexer(): Promise<void> {
       onLogs: (logs) => void Promise.all(logs.map((log) => handleAny(ARC_CHAIN_ID, log))),
       onError: (error) =>
         logger.error({ error, chain: ARC_CHAIN_ID }, 'ReputationOracle watcher failed'),
+      poll: true,
       pollingInterval: 2_000,
     });
   } else {

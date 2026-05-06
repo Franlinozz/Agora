@@ -8,7 +8,9 @@ import { chains } from '../db/schema.ts';
 import { logger } from './logger.ts';
 import { withRpcBackoff } from './rpc-backoff.ts';
 
-const DEFAULT_CHUNK_SIZE = 100n;
+// Arc RPC currently limits eth_getLogs to 10,000-block ranges.
+// Use the largest safe chunk to avoid very slow historical backfills.
+const DEFAULT_CHUNK_SIZE = 10_000n;
 
 type BackfillOptions = {
   chunkSize?: bigint;
