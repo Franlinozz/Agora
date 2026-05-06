@@ -15,6 +15,7 @@ const DEFAULT_CHUNK_SIZE = 10_000n;
 type BackfillOptions = {
   chunkSize?: bigint;
   updateProgress?: boolean;
+  quiet?: boolean;
 };
 
 type BackfillLog = unknown;
@@ -40,10 +41,12 @@ export async function backfill(
     return;
   }
 
-  logger.info(
-    { chain: chainId, address, fromBlock: startBlock, toBlock: currentHead },
-    'backfill started',
-  );
+  if (!options.quiet) {
+    logger.info(
+      { chain: chainId, address, fromBlock: startBlock, toBlock: currentHead },
+      'backfill started',
+    );
+  }
 
   for (let fromBlock = startBlock; fromBlock <= currentHead; fromBlock += chunkSize) {
     const toBlock = minBigInt(fromBlock + chunkSize - 1n, currentHead);
@@ -63,16 +66,18 @@ export async function backfill(
     }
   }
 
-  logger.info(
-    {
-      chain: chainId,
-      address,
-      fromBlock: startBlock,
-      toBlock: currentHead,
-      displayName: chain.displayName,
-    },
-    'backfill complete',
-  );
+  if (!options.quiet) {
+    logger.info(
+      {
+        chain: chainId,
+        address,
+        fromBlock: startBlock,
+        toBlock: currentHead,
+        displayName: chain.displayName,
+      },
+      'backfill complete',
+    );
+  }
 }
 
 export async function setLastIndexedBlock(chainId: string, blockNumber: bigint): Promise<void> {

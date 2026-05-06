@@ -110,7 +110,7 @@ async function pollBaseEvents(
         subscription.address,
         subscription.abi,
         handleBackfillLog,
-        { updateProgress: false },
+        { updateProgress: false, quiet: true },
       );
     }
 
