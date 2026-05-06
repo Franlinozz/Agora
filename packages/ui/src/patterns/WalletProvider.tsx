@@ -16,8 +16,8 @@ import React from 'react';
 import { createConfig, http, WagmiProvider } from 'wagmi';
 
 const queryClient = new QueryClient();
-const baseBuilderCode = process.env.NEXT_PUBLIC_BASE_BUILDER_CODE;
-const dataSuffix = baseBuilderCode ? Attribution.toDataSuffix({ codes: [baseBuilderCode] }) : undefined;
+const baseBuilderCode = process.env.NEXT_PUBLIC_BASE_BUILDER_CODE || 'bc_4audxpcw';
+const dataSuffix = Attribution.toDataSuffix({ codes: [baseBuilderCode] });
 
 export function WalletProvider({ children, walletConnectProjectId }: { children: React.ReactNode; walletConnectProjectId: string }) {
   const evmChains = ACTIVE_CHAINS.filter((chain) => chain.kind === 'evm' && typeof chain.id === 'number').map((chain) => ({
