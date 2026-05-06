@@ -1,10 +1,27 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
 import { Settings } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 
-import { AgentAvatar, Badge, Button, Card, CardContent, EmptyState, Input, Modal, UsdcAmount, toast } from '@agora/ui';
+import { AgentAvatar, Badge, Button, Card, CardContent, EmptyState, Input, Modal, Skeleton, UsdcAmount, toast } from '@agora/ui';
+
+type IndexedAgent = {
+  id?: string;
+  pk?: number;
+  onchainId?: string;
+  deployer: string;
+  tbaAddress?: `0x${string}`;
+  tba?: `0x${string}`;
+  name: string;
+  description: string;
+  active?: boolean;
+  pricePerCallUsdc: string;
+};
+
+type AgentsResponse = {
+  agents: IndexedAgent[];
+};
 
 type MyAgent = {
   id: string;
@@ -13,14 +30,46 @@ type MyAgent = {
   tbaAddress: `0x${string}`;
   active: boolean;
   earningsUsdc: bigint;
-  priceUsdc: string;
+  priceUsdc: bigint;
   pendingTasks: number;
 };
 
-const mockAgents: MyAgent[] = [];
+async function fetchAgents(): Promise<AgentsResponse> {
+  const response = await fetch('/api/agents?limit=100');
+  if (!response.ok) throw new Error('Could not load agents');
+  return response.json() as Promise<AgentsResponse>;
+}
+
+function normalizeAgent(agent: IndexedAgent): MyAgent {
+  return {
+    id: agent.id ?? agent.onchainId ?? String(agent.pk ?? '0'),
+    name: agent.name,
+    description: agent.description,
+    tbaAddress: agent.tbaAddress ?? agent.tba ?? '0x0000000000000000000000000000000000000000',
+    active: agent.active ?? true,
+    earningsUsdc: 0n,
+    priceUsdc: BigInt(agent.pricePerCallUsdc ?? '0'),
+    pendingTasks: 0,
+  };
+}
 
 export function MyAgentsTab({ address }: { address: string }) {
-  const [agents, setAgents] = useState(mockAgents);
+  const { data, isLoading, error } = useQuery({ queryKey: ['dashboard-agents', address], queryFn: fetchAgents });
+  const agents = (data?.agents ?? [])
+    .filter((agent) => agent.deployer.toLowerCase() === address.toLowerCase())
+    .map(normalizeAgent);
+
+  if (isLoading) {
+    return (
+      <div className="grid gap-4 md:grid-cols-2">
+        {Array.from({ length: 2 }).map((_, index) => <Skeleton key={index} className="h-56 w-full" />)}
+      </div>
+    );
+  }
+
+  if (error) {
+    return <EmptyState title="Could not load your agents" description="The dashboard could not reach the indexer API. Try again once the gateway is available." />;
+  }
 
   if (agents.length === 0) {
     return <EmptyState title="No agents deployed yet" description="Deploy your first agent and it will appear here with earnings, pending work, and management actions." action={<Button asChild><Link href="/deploy" className="no-underline">Deploy an agent</Link></Button>} />;
@@ -28,23 +77,21 @@ export function MyAgentsTab({ address }: { address: string }) {
 
   return (
     <div className="grid gap-4 md:grid-cols-2">
-      {agents.map((agent) => <AgentManagementCard key={agent.id} agent={agent} onUpdate={(next) => setAgents((current) => current.map((item) => item.id === next.id ? next : item))} />)}
+      {agents.map((agent) => <AgentManagementCard key={agent.id} agent={agent} />)}
       <span className="sr-only">Wallet {address}</span>
     </div>
   );
 }
 
-function AgentManagementCard({ agent, onUpdate }: { agent: MyAgent; onUpdate: (agent: MyAgent) => void }) {
-  const [price, setPrice] = useState(agent.priceUsdc);
+function AgentManagementCard({ agent }: { agent: MyAgent }) {
+  const price = agent.priceUsdc;
 
   function savePrice() {
-    onUpdate({ ...agent, priceUsdc: price });
-    toast.success('Price update queued for wallet confirmation.');
+    toast.info('On-chain price updates will be enabled in a later release.');
   }
 
   function deactivate() {
-    onUpdate({ ...agent, active: false });
-    toast.info('Deactivate action queued for wallet confirmation.');
+    toast.info('On-chain deactivation will be enabled in a later release.');
   }
 
   return (
@@ -60,7 +107,7 @@ function AgentManagementCard({ agent, onUpdate }: { agent: MyAgent; onUpdate: (a
         </div>
         <div className="grid grid-cols-3 gap-3 text-sm">
           <Metric label="Earnings" value={<UsdcAmount amount={agent.earningsUsdc} />} />
-          <Metric label="Price" value={`$${agent.priceUsdc}`} />
+          <Metric label="Price" value={<UsdcAmount amount={agent.priceUsdc} />} />
           <Metric label="Pending" value={String(agent.pendingTasks)} />
         </div>
         <Modal.Root>
@@ -68,7 +115,7 @@ function AgentManagementCard({ agent, onUpdate }: { agent: MyAgent; onUpdate: (a
           <Modal.Content>
             <Modal.Title className="text-xl font-semibold">Manage {agent.name}</Modal.Title>
             <div className="mt-5 grid gap-4">
-              <Input type="number" min="0.001" step="0.001" label="Price per call" suffix="USDC" value={price} onChange={(event) => setPrice(event.target.value)} />
+              <Input type="text" label="Price per call" suffix="USDC" value={price.toString()} readOnly />
               <div className="flex flex-wrap gap-3">
                 <Button onClick={savePrice}>Update price</Button>
                 <Button variant="danger" onClick={deactivate}>Deactivate</Button>
