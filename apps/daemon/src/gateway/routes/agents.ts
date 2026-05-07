@@ -7,12 +7,18 @@ import { db } from '../../db/client.ts';
 import { agents, escrows, reputations } from '../../db/schema.ts';
 import { serializeJson } from '../../lib/json.ts';
 
+const booleanQueryParam = z.preprocess((value) => {
+  if (value === 'true') return true;
+  if (value === 'false') return false;
+  return value;
+}, z.boolean());
+
 const listQuerySchema = z.object({
   chain: z.string().optional(),
   capability: z.string().optional(),
   minPrice: z.coerce.bigint().optional(),
   maxPrice: z.coerce.bigint().optional(),
-  includeInactive: z.coerce.boolean().default(true),
+  includeInactive: booleanQueryParam.default(true),
   sort: z.enum(['newest', 'oldest', 'price_asc', 'price_desc']).default('newest'),
   limit: z.coerce.number().int().min(1).max(100).default(24),
   offset: z.coerce.number().int().min(0).default(0),
