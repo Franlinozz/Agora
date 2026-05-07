@@ -25,7 +25,7 @@ export function TopNav() {
   const pathname = usePathname();
 
   return (
-    <header className="sticky top-0 z-30 border-b border-[var(--color-bg-3)]/70 bg-[var(--color-bg-0)]/70 backdrop-blur-xl">
+    <header className="sticky top-0 z-30 max-w-full overflow-x-hidden border-b border-[var(--color-bg-3)]/70 bg-[var(--color-bg-0)]/70 backdrop-blur-xl">
       <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link href="/" className="text-xl font-medium tracking-tight text-[var(--color-text-primary)] no-underline">
           Agora
@@ -57,7 +57,7 @@ export function TopNav() {
           {open ? <X className="size-5" /> : <Menu className="size-5" />}
         </Button>
       </nav>
-      <div className={cn('grid gap-1 border-t border-[var(--color-bg-3)] px-4 py-4 md:hidden', !open && 'hidden')}>
+      <div className={cn('mx-auto grid max-w-7xl gap-1 border-t border-[var(--color-bg-3)] px-4 py-4 md:hidden', !open && 'hidden')}>
         {links.map((link) => {
           const isActive = pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href));
           return (

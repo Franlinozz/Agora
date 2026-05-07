@@ -5,6 +5,20 @@
 @tailwind components;
 @tailwind utilities;
 
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
 body {
   min-height: 100vh;
+}
+
+.prose :where(pre, code, table, img, iframe):not(:where(.not-prose, .not-prose *)) {
+  max-width: 100%;
+}
+
+.prose :where(pre, table):not(:where(.not-prose, .not-prose *)) {
+  overflow-x: auto;
 }

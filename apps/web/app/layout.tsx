@@ -28,9 +28,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <WaveBackground opacity={0.045} />
         <Providers>
-          <div className="flex min-h-screen flex-col">
+          <div className="flex min-h-screen min-w-0 flex-col overflow-x-hidden">
             <TopNav />
-            <main className="flex-1">{children}</main>
+            <main className="min-w-0 flex-1 overflow-x-hidden">{children}</main>
             <Footer />
           </div>
           <Chatbot />

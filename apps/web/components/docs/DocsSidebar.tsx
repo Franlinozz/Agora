@@ -31,9 +31,9 @@ export function DocsMobileNav({ docs, active }: { docs: Doc[]; active: string })
   const groups = groupDocs(docs);
 
   return (
-    <nav className="rounded-xl border border-[var(--color-bg-3)] bg-[var(--color-bg-1)] p-3">
+    <nav className="min-w-0 overflow-hidden rounded-xl border border-[var(--color-bg-3)] bg-[var(--color-bg-1)] p-3">
       <p className="px-1 font-mono text-xs uppercase tracking-[0.2em] text-[var(--color-text-tertiary)]">Docs sections</p>
-      <div className="mt-3 flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <div className="mt-3 flex max-w-full gap-2 overflow-x-auto overscroll-x-contain pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {Object.entries(groups).flatMap(([category, items]) => [
           <span key={`${category}-label`} className="flex shrink-0 items-center px-1 font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--color-text-tertiary)]">
             {category}
@@ -51,7 +51,7 @@ function DocLink({ doc, active, compact = false }: { doc: Doc; active: boolean; 
       href={`/docs/${doc.slug}`}
       className={cn(
         'no-underline transition',
-        compact ? 'shrink-0 rounded-full px-3 py-2 text-sm' : 'rounded-md px-3 py-2 text-sm',
+        compact ? 'shrink-0 rounded-full px-3 py-2 text-sm whitespace-nowrap' : 'rounded-md px-3 py-2 text-sm',
         active ? 'bg-[var(--color-bg-2)] text-[var(--color-text-primary)]' : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-1)]',
       )}
     >
