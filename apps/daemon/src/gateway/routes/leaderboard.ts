@@ -18,7 +18,6 @@ export default async function leaderboardRoutes(app: FastifyInstance): Promise<v
       .select({ agent: agents, reputation: reputations })
       .from(agents)
       .leftJoin(reputations, eq(agents.pk, reputations.agentPk))
-      .where(eq(agents.active, true))
       .orderBy(desc(reputations.weightedScore), desc(agents.deployBlock))
       .limit(query.limit)
       .offset(query.offset);
