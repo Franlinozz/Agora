@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { useChainId, useSwitchChain, useWalletClient } from 'wagmi';
+import { useAccount, useChainId, useSendTransaction, useSwitchChain, useWalletClient } from 'wagmi';
 import { encodePacked, keccak256, stringToHex, type Hash, type Hex } from 'viem';
 import { appendBaseAttribution, baseConfig } from '@agora/sdk';
 
@@ -64,8 +64,10 @@ const skillCopy: Record<SkillId, { eyebrow: string; title: string; description: 
 };
 
 export function BaseAppActionSkills() {
+  const { address, isConnected } = useAccount();
   const chainId = useChainId();
   const { switchChainAsync } = useSwitchChain();
+  const { sendTransactionAsync } = useSendTransaction();
   const { data: walletClient } = useWalletClient();
   const [results, setResults] = useState<Partial<Record<SkillId, SkillResult>>>({});
   const [statuses, setStatuses] = useState<Record<SkillId, SkillStatus>>({
@@ -77,7 +79,7 @@ export function BaseAppActionSkills() {
   const [errors, setErrors] = useState<Partial<Record<SkillId, string>>>({});
 
   const connectedToBase = chainId === BASE_ID;
-  const account = walletClient?.account?.address;
+  const account = walletClient?.account?.address ?? address;
   const explorerRoot = useMemo(() => baseConfig.explorerUrl.replace(/\/$/, ''), []);
 
   function setSkillStatus(skill: SkillId, status: SkillStatus) {
@@ -109,7 +111,7 @@ export function BaseAppActionSkills() {
       return;
     }
 
-    if (!walletClient?.account) {
+    if (!account || !isConnected) {
       toast.error('Connect a wallet inside Base App before signing.');
       return;
     }
@@ -123,14 +125,15 @@ export function BaseAppActionSkills() {
         await switchChainAsync({ chainId: BASE_ID });
       }
 
-      const receipt = buildReceipt(skill, walletClient.account.address, result);
-      const txHash = await walletClient.sendTransaction({
-        account: walletClient.account,
-        chain: null,
-        to: walletClient.account.address,
+      const receipt = buildReceipt(skill, account, result);
+      const txRequest = {
+        to: account,
         value: 0n,
         data: receipt.data,
-      });
+      } as const;
+      const txHash = walletClient?.account
+        ? await walletClient.sendTransaction({ ...txRequest, account: walletClient.account, chain: null, data: appendBaseAttribution(BASE_ID, receipt.data) })
+        : await sendTransactionAsync(txRequest);
 
       setTransactions((current) => ({ ...current, [skill]: { hash: txHash, explorerUrl: `${explorerRoot}/tx/${txHash}` } }));
       setSkillStatus(skill, 'confirmed');
@@ -144,10 +147,10 @@ export function BaseAppActionSkills() {
   }
 
   return (
-    <div className="not-prose mt-8 grid gap-5">
-      <div className="rounded-2xl border border-[var(--color-arc-purple)]/30 bg-[var(--color-arc-purple)]/10 p-5">
+    <div className="not-prose mt-8 grid min-w-0 gap-5">
+      <div className="min-w-0 rounded-2xl border border-[var(--color-arc-purple)]/30 bg-[var(--color-arc-purple)]/10 p-4 sm:p-5">
         <p className="font-mono text-xs uppercase tracking-[0.22em] text-[var(--color-arc-purple-light)]">{'// Interactive Base App actions'}</p>
-        <h2 className="mt-2 text-2xl font-semibold text-[var(--color-text-primary)]">Useful queries that end in real Base transactions.</h2>
+        <h2 className="mt-2 text-2xl font-semibold text-[var(--color-text-primary)] sm:text-3xl">Useful queries that end in real Base transactions.</h2>
         <p className="mt-2 text-sm leading-6 text-[var(--color-text-secondary)]">
           These are zero-value onchain receipts, not agent deployments. Query something useful, then sign a Base transaction with Agora Builder Code attribution. You still pay normal Base gas.
         </p>
@@ -156,7 +159,7 @@ export function BaseAppActionSkills() {
         </p>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-3">
+      <div className="grid min-w-0 gap-4 xl:grid-cols-3">
         {(Object.keys(skillCopy) as SkillId[]).map((skill) => {
           const copy = skillCopy[skill];
           const status = statuses[skill];
@@ -167,8 +170,8 @@ export function BaseAppActionSkills() {
           const signLoading = status === 'signing';
 
           return (
-            <Card key={skill} variant="outlined" className="h-full">
-              <CardContent className="flex h-full flex-col gap-4 p-5">
+            <Card key={skill} variant="outlined" className="h-full min-w-0 overflow-hidden">
+              <CardContent className="flex h-full min-w-0 flex-col gap-4 p-4 sm:p-5">
                 <div>
                   <p className="font-mono text-xs uppercase tracking-[0.18em] text-[var(--color-arc-purple-light)]">{copy.eyebrow}</p>
                   <h3 className="mt-2 text-xl font-semibold text-[var(--color-text-primary)]">{copy.title}</h3>
@@ -178,7 +181,7 @@ export function BaseAppActionSkills() {
                 {result ? (
                   <div className="rounded-xl border border-[var(--color-bg-3)] bg-[var(--color-bg-2)] p-3 text-sm">
                     <div className="font-semibold text-[var(--color-text-primary)]">{result.title}</div>
-                    <p className="mt-1 leading-6 text-[var(--color-text-secondary)]">{result.summary}</p>
+                    <p className="mt-1 break-words leading-6 text-[var(--color-text-secondary)]">{result.summary}</p>
                   </div>
                 ) : null}
 
@@ -283,5 +286,5 @@ function buildReceipt(skill: SkillId, wallet: `0x${string}`, result: SkillResult
     [`AGORA_SKILL:${skill}:`, digest],
   );
 
-  return { digest, data: appendBaseAttribution(BASE_ID, data) };
+  return { digest, data };
 }
