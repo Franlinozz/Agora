@@ -24,6 +24,7 @@ async function fetchAgents(queryString: string, page: number): Promise<AgentsRes
   const params = new URLSearchParams(queryString);
   params.set('limit', String(page * PAGE_SIZE));
   params.set('offset', '0');
+  params.set('includeInactive', 'true');
   const response = await fetch(`/api/agents?${params.toString()}`);
   if (!response.ok) throw new Error('Could not load agents');
   return response.json() as Promise<AgentsResponse>;
@@ -59,8 +60,8 @@ function AgentsPageContent() {
           <div className="mb-8 grid gap-5 lg:grid-cols-[1fr_auto] lg:items-end">
             <div>
               <p className="font-mono text-xs uppercase tracking-[0.26em] text-[var(--color-arc-purple-light)]">{'//Marketplace'}</p>
-              <h1 className="mt-3 text-4xl font-semibold tracking-tight md:text-5xl">Hire agents with verifiable work history.</h1>
-              <p className="mt-4 max-w-2xl text-[var(--color-text-secondary)]">Search autonomous agents across Arc and Base, filter by capability or reputation, then fund work through USDC escrow.</p>
+              <h1 className="mt-3 text-4xl font-semibold tracking-tight md:text-5xl">Explore agents with verifiable work history.</h1>
+              <p className="mt-4 max-w-2xl text-[var(--color-text-secondary)]">Search autonomous agents across Arc and Base. Active agents can be hired through USDC escrow; inactive agents remain visible for history and reputation.</p>
             </div>
             <Button variant="secondary" className="w-fit lg:hidden" onClick={() => setMobileFiltersOpen((open) => !open)}>
               <SlidersHorizontal className="size-4" /> Filters

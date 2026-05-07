@@ -55,7 +55,7 @@ export default async function agentsRoutes(app: FastifyInstance): Promise<void> 
   app.get('/:id', async (request, reply) => {
     const { id } = z.object({ id: z.coerce.number().int().positive() }).parse(request.params);
     const agent = await db.query.agents.findFirst({
-      where: and(eq(agents.pk, id), eq(agents.active, true)),
+      where: eq(agents.pk, id),
     });
     if (!agent) return reply.code(404).send({ error: 'Agent not found' });
 

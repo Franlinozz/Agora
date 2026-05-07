@@ -53,6 +53,7 @@ export default async function AgentDetailPage({ params }: { params: { id: string
     averageRating,
     pricePerCallUsdc: row.pricePerCallUsdc,
     createdAt: row.createdAt,
+    active: row.active,
   };
 
   return (
@@ -78,7 +79,7 @@ export default async function AgentDetailPage({ params }: { params: { id: string
           <PreviewWidget agentId={String(row.pk)} agentName={agent.name} />
         </aside>
       </div>
-      <HireCTA agentId={String(row.pk)} />
+      <HireCTA agentId={String(row.pk)} active={row.active} />
     </section>
   );
 }

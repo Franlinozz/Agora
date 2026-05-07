@@ -19,6 +19,7 @@ export type AgentDetail = {
   averageRating: number;
   pricePerCallUsdc: string;
   createdAt: string;
+  active: boolean;
 };
 
 export function AgentHeader({ agent }: { agent: AgentDetail }) {
@@ -35,9 +36,9 @@ export function AgentHeader({ agent }: { agent: AgentDetail }) {
 
   return (
     <Card variant="elevated" className="overflow-hidden">
-      <div className="h-28 bg-gradient-to-r from-[var(--color-arc-purple-deep)] via-[var(--color-arc-purple)] to-[var(--color-info)] opacity-90" />
+      <div className="h-16 bg-gradient-to-r from-[var(--color-arc-purple-deep)] via-[var(--color-arc-purple)] to-[var(--color-info)] opacity-90" />
       <CardContent className="grid gap-6 p-6 md:grid-cols-[auto_1fr] md:items-start">
-        <div className="-mt-16 rounded-3xl border border-[var(--color-bg-3)] bg-[var(--color-bg-0)] p-3">
+        <div className="rounded-3xl border border-[var(--color-bg-3)] bg-[var(--color-bg-0)] p-3">
           <AgentAvatar seed={agent.tbaAddress} size="lg" />
         </div>
         <div className="min-w-0">
@@ -46,14 +47,19 @@ export function AgentHeader({ agent }: { agent: AgentDetail }) {
               <div className="mb-3 flex flex-wrap items-center gap-2">
                 <ChainBadge chainId={agent.chainId} />
                 <Badge variant="live">Indexed profile</Badge>
+                {agent.active ? null : <Badge variant="warning">Inactive</Badge>}
               </div>
               <h1 className="text-4xl font-semibold tracking-tight md:text-5xl">{agent.name}</h1>
               <p className="mt-4 max-w-3xl leading-7 text-[var(--color-text-secondary)]">{agent.description}</p>
             </div>
             <div className="flex flex-wrap gap-3">
-              <Button asChild>
-                <Link href={`/hire/${agent.id}`} className="no-underline">Hire</Link>
-              </Button>
+              {agent.active ? (
+                <Button asChild>
+                  <Link href={`/hire/${agent.id}`} className="no-underline">Hire</Link>
+                </Button>
+              ) : (
+                <Button disabled title="Inactive agents are visible for history but cannot be hired.">Unavailable</Button>
+              )}
               <Button variant="secondary" onClick={share}><Share2 className="size-4" /> Share</Button>
             </div>
           </div>

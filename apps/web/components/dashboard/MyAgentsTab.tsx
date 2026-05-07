@@ -41,7 +41,7 @@ type MyAgent = {
 };
 
 async function fetchAgents(): Promise<AgentsResponse> {
-  const response = await fetch('/api/agents?limit=100');
+  const response = await fetch('/api/agents?includeInactive=true&limit=100');
   if (!response.ok) throw new Error('Could not load agents');
   return response.json() as Promise<AgentsResponse>;
 }
@@ -86,7 +86,7 @@ export function MyAgentsTab({ address }: { address: string }) {
   }
 
   if (agents.length === 0) {
-    return <EmptyState title="No agents deployed yet" description="Deploy your first agent and it will appear here with earnings, pending work, and management actions." action={<Button asChild><Link href="/deploy" className="no-underline">Deploy an agent</Link></Button>} />;
+    return <EmptyState title="No agents deployed for this wallet" description="Agents deployed by the connected wallet will appear here, including inactive historical agents." action={<Button asChild><Link href="/deploy" className="no-underline">Deploy an agent</Link></Button>} />;
   }
 
   return (
@@ -172,7 +172,7 @@ function AgentManagementCard({ agent, onDeactivated }: { agent: MyAgent; onDeact
               <Input type="text" label="Price per call" suffix="USDC" value={price.toString()} readOnly />
               <div className="flex flex-wrap gap-3">
                 <Button onClick={savePrice}>Update price</Button>
-                <Button variant="danger" onClick={deactivate} loading={deactivating}>{deactivating ? 'Deactivating…' : 'Deactivate'}</Button>
+                <Button variant="danger" onClick={deactivate} loading={deactivating} disabled={!agent.active}>{agent.active ? (deactivating ? 'Deactivating…' : 'Deactivate') : 'Already inactive'}</Button>
                 <Modal.Close asChild><Button variant="secondary">Close</Button></Modal.Close>
               </div>
             </div>

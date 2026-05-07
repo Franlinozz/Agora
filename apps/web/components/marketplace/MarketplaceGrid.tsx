@@ -17,6 +17,7 @@ export type MarketplaceAgent = {
   pricePerCallUsdc: string;
   modelProvider?: 'openai' | 'anthropic' | 'custom';
   createdAt: string;
+  active?: boolean;
   reputation?: {
     completedTasks: number;
     disputedTasks: number;
@@ -48,6 +49,7 @@ function normalizeAgent(agent: MarketplaceAgent): Agent {
     description: agent.description,
     capabilityHash: agent.capabilityHash,
     pricePerCallUsdc: BigInt(agent.pricePerCallUsdc ?? '0'),
+    active: agent.active ?? true,
     modelProvider: agent.modelProvider ?? 'custom',
     createdAt: new Date(agent.createdAt),
   };

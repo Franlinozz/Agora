@@ -92,14 +92,14 @@ export async function fetchAgentDetail(agentRef: string): Promise<ApiAgentDetail
 }
 
 async function findAgentByChainAndOnchainId(chainId: string, onchainId: string): Promise<ApiAgent | null> {
-  const response = await vmFetch(`/agents?chain=${encodeURIComponent(chainId)}&limit=100`);
+  const response = await vmFetch(`/agents?chain=${encodeURIComponent(chainId)}&includeInactive=true&limit=100`);
   if (!response.ok) return null;
   const data = (await response.json()) as { agents?: ApiAgent[] };
   return data.agents?.find((agent) => agent.onchainId === onchainId) ?? null;
 }
 
 async function findAgentByOnchainId(onchainId: string): Promise<ApiAgent | null> {
-  const response = await vmFetch('/agents?limit=100');
+  const response = await vmFetch('/agents?includeInactive=true&limit=100');
   if (!response.ok) return null;
   const data = (await response.json()) as { agents?: ApiAgent[] };
   return data.agents?.find((agent) => agent.onchainId === onchainId) ?? null;
