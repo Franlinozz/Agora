@@ -12,7 +12,7 @@ const listQuerySchema = z.object({
   capability: z.string().optional(),
   minPrice: z.coerce.bigint().optional(),
   maxPrice: z.coerce.bigint().optional(),
-  includeInactive: z.coerce.boolean().default(false),
+  includeInactive: z.coerce.boolean().default(true),
   sort: z.enum(['newest', 'oldest', 'price_asc', 'price_desc']).default('newest'),
   limit: z.coerce.number().int().min(1).max(100).default(24),
   offset: z.coerce.number().int().min(0).default(0),
