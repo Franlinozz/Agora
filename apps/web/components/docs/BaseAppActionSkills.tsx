@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { useAccount, useChainId, useSendTransaction, useSwitchChain, useWalletClient } from 'wagmi';
-import { encodePacked, keccak256, stringToHex, type Hash, type Hex } from 'viem';
+import { encodePacked, keccak256, stringToHex, type Hash, type Hex, type WalletClient } from 'viem';
 import { appendBaseAttribution, baseConfig } from '@agora/sdk';
 
 import { Button, Card, CardContent, toast } from '@agora/ui';
@@ -39,6 +39,16 @@ type AgentRow = {
   chainId?: string;
   active?: boolean;
 };
+
+type EthereumProvider = {
+  request: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
+};
+
+declare global {
+  interface Window {
+    ethereum?: EthereumProvider;
+  }
+}
 
 const BASE_ID = Number(baseConfig.id);
 
@@ -126,14 +136,12 @@ export function BaseAppActionSkills() {
       }
 
       const receipt = buildReceipt(skill, account, result);
-      const txRequest = {
-        to: account,
-        value: 0n,
+      const txHash = await sendBaseReceiptTransaction({
+        account,
         data: receipt.data,
-      } as const;
-      const txHash = walletClient?.account
-        ? await walletClient.sendTransaction({ ...txRequest, account: walletClient.account, chain: null, data: appendBaseAttribution(BASE_ID, receipt.data) })
-        : await sendTransactionAsync(txRequest);
+        walletClient,
+        sendTransactionAsync,
+      });
 
       setTransactions((current) => ({ ...current, [skill]: { hash: txHash, explorerUrl: `${explorerRoot}/tx/${txHash}` } }));
       setSkillStatus(skill, 'confirmed');
@@ -215,9 +223,7 @@ async function querySkill(skill: SkillId): Promise<SkillResult> {
 }
 
 async function queryEthPrice(): Promise<SkillResult> {
-  const response = await fetch('/api/market/eth-price', { cache: 'no-store' });
-  if (!response.ok) throw new Error('ETH price API is unavailable right now.');
-  const body = (await response.json()) as { amount?: string; currency?: string; source?: string; observedAt?: string };
+  const body = await fetchEthPrice();
   const amount = body.amount;
   if (!amount) throw new Error('ETH price response was incomplete.');
   const rounded = Number(amount).toLocaleString(undefined, { maximumFractionDigits: 2 });
@@ -228,6 +234,23 @@ async function queryEthPrice(): Promise<SkillResult> {
     summary: `Fetched from ${body.source ?? 'market data provider'} at ${new Date(observedAt).toUTCString()}.`,
     payload: { source: body.source ?? 'coinbase', pair: 'ETH-USD', amount, currency: body.currency ?? 'USD', observedAt },
   };
+}
+
+async function fetchEthPrice(): Promise<{ amount?: string; currency?: string; source?: string; observedAt?: string }> {
+  const apiResult = await fetch('/api/market/eth-price', { cache: 'no-store' })
+    .then(async (response) => (response.ok ? response.json() as Promise<{ amount?: string; currency?: string; source?: string; observedAt?: string }> : null))
+    .catch(() => null);
+  if (apiResult?.amount) return apiResult;
+
+  const coinGeckoResult = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd', { cache: 'no-store' })
+    .then(async (response) => (response.ok ? response.json() as Promise<{ ethereum?: { usd?: number } }> : null))
+    .catch(() => null);
+  const amount = coinGeckoResult?.ethereum?.usd;
+  if (amount && Number.isFinite(amount)) {
+    return { amount: amount.toString(), currency: 'USD', source: 'coingecko-client', observedAt: new Date().toISOString() };
+  }
+
+  throw new Error('ETH price API is unavailable right now.');
 }
 
 async function queryLeaderboard(): Promise<SkillResult> {
@@ -267,6 +290,38 @@ async function queryAgentDiscovery(): Promise<SkillResult> {
     summary: `Active marketplace snapshot: ${Object.entries(byChain).map(([chain, count]) => `${chain}: ${count}`).join(', ') || 'no active agents'}.`,
     payload: { source: 'agora-agents', total: body.total ?? agents.length, byChain, observedAt: new Date().toISOString() },
   };
+}
+
+async function sendBaseReceiptTransaction({
+  account,
+  data,
+  walletClient,
+  sendTransactionAsync,
+}: {
+  account: `0x${string}`;
+  data: Hex;
+  walletClient?: WalletClient | null;
+  sendTransactionAsync: (request: { to: `0x${string}`; value: bigint; data: Hex }) => Promise<Hash>;
+}): Promise<Hash> {
+  const attributedData = appendBaseAttribution(BASE_ID, data);
+
+  if (walletClient?.account) {
+    return walletClient.sendTransaction({ account: walletClient.account, chain: null, to: account, value: 0n, data: attributedData });
+  }
+
+  try {
+    return await sendTransactionAsync({ to: account, value: 0n, data });
+  } catch (error) {
+    const provider = typeof window !== 'undefined' ? window.ethereum : undefined;
+    if (!provider) throw error;
+
+    const hash = await provider.request({
+      method: 'eth_sendTransaction',
+      params: [{ from: account, to: account, value: '0x0', data: attributedData }],
+    });
+    if (typeof hash !== 'string' || !hash.startsWith('0x')) throw error;
+    return hash as Hash;
+  }
 }
 
 function buildReceipt(skill: SkillId, wallet: `0x${string}`, result: SkillResult): { data: Hex; digest: Hex } {
