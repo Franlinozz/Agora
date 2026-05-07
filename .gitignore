@@ -9,6 +9,7 @@ out/
 .env.local
 .env.*.local
 *.log
+logs/
 .DS_Store
 coverage/
 test-results/

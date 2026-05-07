@@ -1,5 +1,7 @@
 'use client';
 
+import { Suspense } from 'react';
+
 import { Wizard } from '@/components/deploy/Wizard';
 import { AnimateIn } from '@/components/motion/AnimateIn';
 
@@ -15,7 +17,9 @@ export default function DeployPage() {
           </div>
         </AnimateIn>
         <AnimateIn direction="up" distance={20} delay={0.15}>
-          <Wizard />
+          <Suspense fallback={<div className="rounded-xl border border-[var(--color-bg-3)] bg-[var(--color-bg-1)] p-6 text-[var(--color-text-secondary)]">Loading deploy form…</div>}>
+            <Wizard />
+          </Suspense>
         </AnimateIn>
       </div>
     </section>

@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useContext, useMemo, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 
 import { ACTIVE_CHAINS, arcConfig } from '@agora/chains';
 import { Card, CardContent, CardFooter, Button } from '@agora/ui';
@@ -65,8 +66,24 @@ export function useDeployForm() {
 
 const steps = ['Connect', 'Describe', 'Capabilities', 'Pricing', 'Review'];
 
+function buildInitialData(searchParams: { get: (name: string) => string | null }): DeployFormData {
+  const name = searchParams.get('name')?.trim().slice(0, 32);
+  const description = searchParams.get('description')?.trim().slice(0, 280);
+  const priceUsdc = searchParams.get('priceUsdc')?.trim();
+  const price = priceUsdc ? Number(priceUsdc) : NaN;
+
+  return {
+    ...defaultData,
+    name: name || defaultData.name,
+    description: description || defaultData.description,
+    priceUsdc: priceUsdc && Number.isFinite(price) && price >= MIN_PRICE_USDC && price <= MAX_PRICE_USDC ? priceUsdc : defaultData.priceUsdc,
+  };
+}
+
 export function Wizard() {
-  const [data, setData] = useState<DeployFormData>(defaultData);
+  const searchParams = useSearchParams();
+  const initialData = useMemo(() => buildInitialData(searchParams), [searchParams]);
+  const [data, setData] = useState<DeployFormData>(initialData);
   const [step, setStep] = useState(0);
   const [error, setError] = useState('');
 

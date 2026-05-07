@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, gte, ilike, lte, type SQL } from 'drizzle-orm';
+import { and, asc, count, desc, eq, gte, ilike, lte, type SQL } from 'drizzle-orm';
 import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import { getAgent } from '@agora/sdk';
@@ -18,7 +18,7 @@ const listQuerySchema = z.object({
   capability: z.string().optional(),
   minPrice: z.coerce.bigint().optional(),
   maxPrice: z.coerce.bigint().optional(),
-  includeInactive: booleanQueryParam.default(true),
+  includeInactive: booleanQueryParam.default(false),
   sort: z.enum(['newest', 'oldest', 'price_asc', 'price_desc']).default('newest'),
   limit: z.coerce.number().int().min(1).max(100).default(24),
   offset: z.coerce.number().int().min(0).default(0),
@@ -47,15 +47,19 @@ export default async function agentsRoutes(app: FastifyInstance): Promise<void> 
             ? desc(agents.pricePerCallUsdc)
             : desc(agents.createdAt);
 
-    const rows = await db
-      .select()
-      .from(agents)
-      .where(filters.length ? and(...filters) : undefined)
-      .orderBy(orderBy)
-      .limit(query.limit)
-      .offset(query.offset);
+    const where = filters.length ? and(...filters) : undefined;
+    const [rows, totalRows] = await Promise.all([
+      db
+        .select()
+        .from(agents)
+        .where(where)
+        .orderBy(orderBy)
+        .limit(query.limit)
+        .offset(query.offset),
+      db.select({ value: count() }).from(agents).where(where),
+    ]);
 
-    return { agents: serializeJson(rows), limit: query.limit, offset: query.offset };
+    return { agents: serializeJson(rows), total: totalRows[0]?.value ?? 0, limit: query.limit, offset: query.offset };
   });
 
   app.get('/:id', async (request, reply) => {

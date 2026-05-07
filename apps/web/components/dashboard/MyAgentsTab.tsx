@@ -99,6 +99,13 @@ export function MyAgentsTab({ address }: { address: string }) {
 
 function AgentManagementCard({ agent, onDeactivated }: { agent: MyAgent; onDeactivated: () => void }) {
   const price = agent.priceUsdc;
+  const redeployParams = new URLSearchParams({
+    name: agent.name.slice(0, 32),
+    description: agent.description.slice(0, 280),
+    priceUsdc: formatUsdcInput(agent.priceUsdc),
+    sourceAgent: agent.id,
+  });
+  const redeployHref = `/deploy?${redeployParams.toString()}`;
   const connectedChainId = useChainId();
   const { data: walletClient } = useWalletClient();
   const [deactivating, setDeactivating] = useState(false);
@@ -169,10 +176,15 @@ function AgentManagementCard({ agent, onDeactivated }: { agent: MyAgent; onDeact
           <Modal.Content>
             <Modal.Title className="text-xl font-semibold">Manage {agent.name}</Modal.Title>
             <div className="mt-5 grid gap-4">
-              <Input type="text" label="Price per call" suffix="USDC" value={price.toString()} readOnly />
+              <Input type="text" label="Price per call" suffix="USDC" value={formatUsdcInput(price)} readOnly />
+              {!agent.active ? <p className="rounded-lg border border-[var(--color-bg-3)] bg-[var(--color-bg-2)] p-3 text-sm text-[var(--color-text-secondary)]">Inactive agents are hidden from marketplace and leaderboard, but remain here for history. The current registry cannot flip the same onchain agent back to active, so reactivation creates a fresh listing from the deploy flow.</p> : null}
               <div className="flex flex-wrap gap-3">
-                <Button onClick={savePrice}>Update price</Button>
-                <Button variant="danger" onClick={deactivate} loading={deactivating} disabled={!agent.active}>{agent.active ? (deactivating ? 'Deactivating…' : 'Deactivate') : 'Already inactive'}</Button>
+                {agent.active ? <Button onClick={savePrice}>Update price</Button> : null}
+                {agent.active ? (
+                  <Button variant="danger" onClick={deactivate} loading={deactivating}>{deactivating ? 'Deactivating…' : 'Deactivate'}</Button>
+                ) : (
+                  <Button asChild><Link href={redeployHref} className="no-underline">Reactivate as new listing</Link></Button>
+                )}
                 <Modal.Close asChild><Button variant="secondary">Close</Button></Modal.Close>
               </div>
             </div>
@@ -181,6 +193,13 @@ function AgentManagementCard({ agent, onDeactivated }: { agent: MyAgent; onDeact
       </CardContent>
     </Card>
   );
+}
+
+function formatUsdcInput(amount: bigint): string {
+  const whole = amount / 1_000_000n;
+  const fractional = amount % 1_000_000n;
+  if (fractional === 0n) return whole.toString();
+  return `${whole}.${fractional.toString().padStart(6, '0').replace(/0+$/, '')}`;
 }
 
 function Metric({ label, value }: { label: string; value: React.ReactNode }) {
