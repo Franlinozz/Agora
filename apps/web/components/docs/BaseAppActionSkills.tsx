@@ -212,17 +212,18 @@ async function querySkill(skill: SkillId): Promise<SkillResult> {
 }
 
 async function queryEthPrice(): Promise<SkillResult> {
-  const response = await fetch('https://api.coinbase.com/v2/prices/ETH-USD/spot', { cache: 'no-store' });
+  const response = await fetch('/api/market/eth-price', { cache: 'no-store' });
   if (!response.ok) throw new Error('ETH price API is unavailable right now.');
-  const body = (await response.json()) as { data?: { amount?: string; currency?: string } };
-  const amount = body.data?.amount;
+  const body = (await response.json()) as { amount?: string; currency?: string; source?: string; observedAt?: string };
+  const amount = body.amount;
   if (!amount) throw new Error('ETH price response was incomplete.');
   const rounded = Number(amount).toLocaleString(undefined, { maximumFractionDigits: 2 });
+  const observedAt = body.observedAt ?? new Date().toISOString();
 
   return {
     title: `ETH is $${rounded}`,
-    summary: `Fetched from Coinbase spot price feed at ${new Date().toUTCString()}.`,
-    payload: { source: 'coinbase', pair: 'ETH-USD', amount, observedAt: new Date().toISOString() },
+    summary: `Fetched from ${body.source ?? 'market data provider'} at ${new Date(observedAt).toUTCString()}.`,
+    payload: { source: body.source ?? 'coinbase', pair: 'ETH-USD', amount, currency: body.currency ?? 'USD', observedAt },
   };
 }
 
