@@ -1,4 +1,5 @@
 export * from './abis/index.ts';
+export * from './attribution.ts';
 export * from './client.ts';
 export * from './clients/index.ts';
 export * from './contracts/agentRegistry.ts';

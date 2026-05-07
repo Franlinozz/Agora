@@ -1,9 +1,10 @@
 
 import { getChainOrThrow } from '@agora/chains';
 import { ChainNotSupportedError, type Agent } from '@agora/shared';
-import { type Account, type Address, type Hash, type WalletClient } from 'viem';
+import { type Account, type Address, type Hash, type Hex, type WalletClient } from 'viem';
 
 import { agentRegistryAbi } from '../abis/index.ts';
+import { builderCodeDataSuffix, shouldAttributeChain, writeAttributedContract } from '../attribution.ts';
 import { getPublicClient, getWalletClient } from '../clients/index.ts';
 
 type AgentStruct = {
@@ -28,18 +29,19 @@ export async function deployAgent(
   chainId: number | string,
   account: Account | WalletClient,
   params: { metadataURI: string; capabilityHash: Hash; pricePerCallUsdc: bigint },
-): Promise<{ agentId: bigint; txHash: Hash }> {
+): Promise<{ agentId: bigint; txHash: Hash; attributed: boolean; dataSuffix?: Hex }> {
   const wallet = getWalletClient(chainId, account);
   const agentId = (await totalAgents(chainId)) + 1n;
-  const txHash = await wallet.writeContract({
+  const txHash = await writeAttributedContract({
+    chainId,
+    wallet,
+    account: wallet.account ?? (account as Account),
     address: registryAddress(chainId),
     abi: agentRegistryAbi,
     functionName: 'deployAgent',
     args: [params.metadataURI, params.capabilityHash, params.pricePerCallUsdc],
-    account: wallet.account ?? (account as Account),
-    chain: null,
   });
-  return { agentId, txHash };
+  return { agentId, txHash, attributed: shouldAttributeChain(chainId), dataSuffix: shouldAttributeChain(chainId) ? builderCodeDataSuffix() : undefined };
 }
 
 export async function updatePrice(
@@ -49,13 +51,14 @@ export async function updatePrice(
   newPrice: bigint,
 ): Promise<Hash> {
   const wallet = getWalletClient(chainId, account);
-  return wallet.writeContract({
+  return writeAttributedContract({
+    chainId,
+    wallet,
+    account: wallet.account ?? (account as Account),
     address: registryAddress(chainId),
     abi: agentRegistryAbi,
     functionName: 'updatePrice',
     args: [agentId, newPrice],
-    account: wallet.account ?? (account as Account),
-    chain: null,
   });
 }
 
@@ -65,13 +68,14 @@ export async function deactivateAgent(
   agentId: bigint,
 ): Promise<Hash> {
   const wallet = getWalletClient(chainId, account);
-  return wallet.writeContract({
+  return writeAttributedContract({
+    chainId,
+    wallet,
+    account: wallet.account ?? (account as Account),
     address: registryAddress(chainId),
     abi: agentRegistryAbi,
     functionName: 'deactivateAgent',
     args: [agentId],
-    account: wallet.account ?? (account as Account),
-    chain: null,
   });
 }
 

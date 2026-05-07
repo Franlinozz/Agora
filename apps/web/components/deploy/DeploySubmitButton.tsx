@@ -16,6 +16,7 @@ export function DeploySubmitButton({ data, capabilities }: { data: DeployFormDat
   const { data: walletClient } = useWalletClient();
   const [status, setStatus] = useState<'idle' | 'building' | 'pending' | 'confirmed' | 'error'>('idle');
   const [txHash, setTxHash] = useState('');
+  const [attributionNote, setAttributionNote] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
   async function deploy() {
@@ -45,8 +46,9 @@ export function DeploySubmitButton({ data, capabilities }: { data: DeployFormDat
         modelProvider: 'custom',
       }, data.chainId);
       setTxHash(result.txHash);
+      setAttributionNote(result.attributed ? 'Base Builder Code attribution attached. Verify the transaction input ends with the ERC-8021 marker: 80218021802180218021802180218021.' : 'Attribution is only attached on Base mainnet transactions.');
       setStatus('confirmed');
-      toast.success('Agent deployed. Redirecting to profile.');
+      toast.success(result.attributed ? 'Agent deployed with Base attribution. Redirecting to profile.' : 'Agent deployed. Redirecting to profile.');
       router.push(`/agents/${data.chainId}:${result.agentId.toString()}`);
     } catch (error) {
       console.error(error);
@@ -60,6 +62,7 @@ export function DeploySubmitButton({ data, capabilities }: { data: DeployFormDat
   return (
     <div className="grid gap-3">
       {txHash ? <p className="font-mono text-xs text-[var(--color-success)]">Transaction: {txHash}</p> : null}
+      {attributionNote ? <p className="text-xs text-[var(--color-text-secondary)]">{attributionNote}</p> : null}
       {status === 'error' ? <p className="text-sm text-[var(--color-danger)]">{errorMessage || 'Deployment could not be submitted. This is expected if contracts or wallet testnet setup are unavailable.'}</p> : null}
       <Button onClick={deploy} loading={status === 'building' || status === 'pending'}>{status === 'pending' ? 'Waiting for wallet…' : status === 'confirmed' ? 'Confirmed' : 'Deploy agent'}</Button>
     </div>

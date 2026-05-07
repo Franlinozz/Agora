@@ -1,5 +1,5 @@
 import type { AgentCapability } from '@agora/shared';
-import type { Account, Hash, WalletClient } from 'viem';
+import type { Account, Hash, Hex, WalletClient } from 'viem';
 
 
 export interface AgoraClientConfig {
@@ -29,4 +29,6 @@ export interface HireResult {
   escrowId: bigint;
   createTxHash: Hash;
   approvalTxHash?: Hash;
+  attributed: boolean;
+  dataSuffix?: Hex;
 }

@@ -4,6 +4,7 @@ import { ChainNotSupportedError, EscrowState, type Escrow } from '@agora/shared'
 import { erc20Abi, type Account, type Address, type Hash, type Hex, type WalletClient } from 'viem';
 
 import { escrowManagerAbi } from '../abis/index.ts';
+import { builderCodeDataSuffix, shouldAttributeChain, writeAttributedContract } from '../attribution.ts';
 import { getPublicClient, getWalletClient } from '../clients/index.ts';
 
 type EscrowStruct = {
@@ -43,7 +44,7 @@ export async function createEscrow(
     confidential: boolean;
     encryptedTaskBlob: Hex;
   },
-): Promise<{ escrowId: bigint; approvalTxHash?: Hash; createTxHash: Hash }> {
+): Promise<{ escrowId: bigint; approvalTxHash?: Hash; createTxHash: Hash; attributed: boolean; dataSuffix?: Hex }> {
   const client = getPublicClient(chainId);
   const wallet = getWalletClient(chainId, account);
   const spender = escrowAddress(chainId);
@@ -57,19 +58,23 @@ export async function createEscrow(
   })) as bigint;
 
   if (allowance < params.amountUsdc) {
-    approvalTxHash = await wallet.writeContract({
+    approvalTxHash = await writeAttributedContract({
+      chainId,
+      wallet,
+      account: wallet.account ?? (account as Account),
       address: usdcAddress(chainId),
       abi: erc20Abi,
       functionName: 'approve',
       args: [spender, params.amountUsdc],
-      account: wallet.account ?? (account as Account),
-      chain: null,
     });
     await client.waitForTransactionReceipt({ hash: approvalTxHash });
   }
 
   const nextEscrowId = ((await totalEscrows(chainId)) as bigint) + 1n;
-  const createTxHash = await wallet.writeContract({
+  const createTxHash = await writeAttributedContract({
+    chainId,
+    wallet,
+    account: wallet.account ?? (account as Account),
     address: spender,
     abi: escrowManagerAbi,
     functionName: 'createEscrow',
@@ -81,11 +86,9 @@ export async function createEscrow(
       params.confidential,
       params.encryptedTaskBlob,
     ],
-    account: wallet.account ?? (account as Account),
-    chain: null,
   });
 
-  return { escrowId: nextEscrowId, approvalTxHash, createTxHash };
+  return { escrowId: nextEscrowId, approvalTxHash, createTxHash, attributed: shouldAttributeChain(chainId), dataSuffix: shouldAttributeChain(chainId) ? builderCodeDataSuffix() : undefined };
 }
 
 export async function submitDelivery(
@@ -96,13 +99,14 @@ export async function submitDelivery(
   encryptedDeliveryBlob: Hex = '0x',
 ): Promise<Hash> {
   const wallet = getWalletClient(chainId, account);
-  return wallet.writeContract({
+  return writeAttributedContract({
+    chainId,
+    wallet,
+    account: wallet.account ?? (account as Account),
     address: escrowAddress(chainId),
     abi: escrowManagerAbi,
     functionName: 'submitDelivery',
     args: [escrowId, deliveryHash, encryptedDeliveryBlob],
-    account: wallet.account ?? (account as Account),
-    chain: null,
   });
 }
 
@@ -112,13 +116,14 @@ export async function verifyAndRelease(
   escrowId: bigint,
 ): Promise<Hash> {
   const wallet = getWalletClient(chainId, account);
-  return wallet.writeContract({
+  return writeAttributedContract({
+    chainId,
+    wallet,
+    account: wallet.account ?? (account as Account),
     address: escrowAddress(chainId),
     abi: escrowManagerAbi,
     functionName: 'verifyAndRelease',
     args: [escrowId],
-    account: wallet.account ?? (account as Account),
-    chain: null,
   });
 }
 
@@ -129,13 +134,14 @@ export async function dispute(
   reason: string,
 ): Promise<Hash> {
   const wallet = getWalletClient(chainId, account);
-  return wallet.writeContract({
+  return writeAttributedContract({
+    chainId,
+    wallet,
+    account: wallet.account ?? (account as Account),
     address: escrowAddress(chainId),
     abi: escrowManagerAbi,
     functionName: 'dispute',
     args: [escrowId, reason],
-    account: wallet.account ?? (account as Account),
-    chain: null,
   });
 }
 
@@ -145,13 +151,14 @@ export async function refundExpired(
   escrowId: bigint,
 ): Promise<Hash> {
   const wallet = getWalletClient(chainId, account);
-  return wallet.writeContract({
+  return writeAttributedContract({
+    chainId,
+    wallet,
+    account: wallet.account ?? (account as Account),
     address: escrowAddress(chainId),
     abi: escrowManagerAbi,
     functionName: 'refundExpired',
     args: [escrowId],
-    account: wallet.account ?? (account as Account),
-    chain: null,
   });
 }
 
