@@ -4,7 +4,7 @@ set -euo pipefail
 AGORA_DIR=${AGORA_DIR:-/opt/agora}
 LOG_DIR=${AGORA_LOG_DIR:-/var/log/agora}
 COMPOSE=(docker compose -f docker-compose.yml -f docker-compose.prod.yml)
-MAX_DISK_USE_PERCENT=${MAX_DISK_USE_PERCENT:-90}
+MAX_DISK_USE_PERCENT=${MAX_DISK_USE_PERCENT:-85}
 
 cd "$AGORA_DIR"
 mkdir -p "$LOG_DIR"

@@ -69,6 +69,12 @@ export class AgoraClient {
     });
   }
 
+  /** Deactivate an owned agent on-chain so it is removed from active marketplace surfaces. */
+  async deactivateAgent(agentId: bigint, chainId?: number | string): Promise<Hash> {
+    const signer = this.getSigner();
+    return agentContract.deactivateAgent(chainId ?? this.defaultChainId, signer, agentId);
+  }
+
   /** Read one agent by id from a chain. */
   async getAgent(agentId: bigint, chainId?: number | string) {
     return agentContract.getAgent(chainId ?? this.defaultChainId, agentId);

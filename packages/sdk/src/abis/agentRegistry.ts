@@ -528,6 +528,19 @@ export const agentRegistryAbi = [
   },
   {
     "type": "event",
+    "name": "AgentDeactivated",
+    "inputs": [
+      {
+        "name": "agentId",
+        "type": "uint256",
+        "indexed": true,
+        "internalType": "uint256"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
     "name": "AgentDeployed",
     "inputs": [
       {

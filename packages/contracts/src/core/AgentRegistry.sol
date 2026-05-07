@@ -69,6 +69,7 @@ contract AgentRegistry is IAgentRegistry, ERC721, Ownable2Step, Pausable, Reentr
     function deactivateAgent(uint256 agentId) external whenNotPaused {
         _requireAgentOwner(agentId);
         _agents[agentId].active = false;
+        emit Events.AgentDeactivated(agentId);
     }
 
     function getAgent(uint256 agentId) external view returns (AgentMetadata memory) {

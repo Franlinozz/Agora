@@ -21,6 +21,7 @@ type EventHandler = (chainId: string, log: DecodedLog) => Promise<void>;
 const DISPATCH: Record<string, EventHandler> = {
   AgentDeployed: handlers.handleAgentDeployed,
   AgentPriceUpdated: handlers.handleAgentPriceUpdated,
+  AgentDeactivated: handlers.handleAgentDeactivated,
   EscrowCreated: handlers.handleEscrowCreated,
   EscrowFunded: handlers.handleEscrowFunded,
   DeliverySubmitted: handlers.handleDeliverySubmitted,

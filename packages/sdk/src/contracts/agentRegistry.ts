@@ -127,6 +127,7 @@ function mapAgentStruct(chainId: number | string, id: bigint, result: AgentStruc
     deployer: result.deployer,
     tbaAddress: result.tba,
     pricePerCallUsdc: result.pricePerCallUsdc,
+    active: result.active,
     capabilityHash: result.capabilityHash,
     name: 'Agent',
     description: result.metadataURI,

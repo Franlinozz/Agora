@@ -1,6 +1,7 @@
 import { and, asc, desc, eq, gte, ilike, lte, type SQL } from 'drizzle-orm';
 import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
+import { getAgent } from '@agora/sdk';
 
 import { db } from '../../db/client.ts';
 import { agents, escrows, reputations } from '../../db/schema.ts';
@@ -11,15 +12,21 @@ const listQuerySchema = z.object({
   capability: z.string().optional(),
   minPrice: z.coerce.bigint().optional(),
   maxPrice: z.coerce.bigint().optional(),
+  includeInactive: z.coerce.boolean().default(false),
   sort: z.enum(['newest', 'oldest', 'price_asc', 'price_desc']).default('newest'),
   limit: z.coerce.number().int().min(1).max(100).default(24),
   offset: z.coerce.number().int().min(0).default(0),
+});
+
+const deactivateBodySchema = z.object({
+  txHash: z.string().optional(),
 });
 
 export default async function agentsRoutes(app: FastifyInstance): Promise<void> {
   app.get('/', async (request) => {
     const query = listQuerySchema.parse(request.query);
     const filters: SQL[] = [];
+    if (!query.includeInactive) filters.push(eq(agents.active, true));
     if (query.chain) filters.push(eq(agents.chainId, query.chain));
     if (query.capability) filters.push(ilike(agents.capabilityHash, `%${query.capability}%`));
     if (query.minPrice !== undefined) filters.push(gte(agents.pricePerCallUsdc, query.minPrice));
@@ -47,7 +54,9 @@ export default async function agentsRoutes(app: FastifyInstance): Promise<void> 
 
   app.get('/:id', async (request, reply) => {
     const { id } = z.object({ id: z.coerce.number().int().positive() }).parse(request.params);
-    const agent = await db.query.agents.findFirst({ where: eq(agents.pk, id) });
+    const agent = await db.query.agents.findFirst({
+      where: and(eq(agents.pk, id), eq(agents.active, true)),
+    });
     if (!agent) return reply.code(404).send({ error: 'Agent not found' });
 
     const reputation = await db.query.reputations.findFirst({
@@ -55,6 +64,27 @@ export default async function agentsRoutes(app: FastifyInstance): Promise<void> 
     });
 
     return serializeJson({ agent, reputation });
+  });
+
+  app.post('/:id/deactivate', async (request, reply) => {
+    const { id } = z.object({ id: z.coerce.number().int().positive() }).parse(request.params);
+    const body = deactivateBodySchema.parse(request.body ?? {});
+    const indexedAgent = await db.query.agents.findFirst({ where: eq(agents.pk, id) });
+    if (!indexedAgent) return reply.code(404).send({ error: 'Agent not found' });
+
+    const onchainAgent = await getAgent(indexedAgent.chainId, indexedAgent.onchainId).catch(() => null);
+    if (!onchainAgent) return reply.code(502).send({ error: 'Could not verify agent on-chain' });
+    if (onchainAgent.active !== false) {
+      return reply.code(409).send({ error: 'Agent is still active on-chain' });
+    }
+
+    const [updated] = await db
+      .update(agents)
+      .set({ active: false, updatedAt: new Date() })
+      .where(eq(agents.pk, id))
+      .returning();
+
+    return serializeJson({ agent: updated, txHash: body.txHash ?? null });
   });
 
   app.get('/:id/escrows', async (request) => {

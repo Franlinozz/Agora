@@ -12,6 +12,7 @@ export interface Agent {
   description: string;
   capabilityHash: HexString;
   pricePerCallUsdc: bigint;
+  active?: boolean;
   modelProvider: 'openai' | 'anthropic' | 'custom';
   createdAt: Date;
 }

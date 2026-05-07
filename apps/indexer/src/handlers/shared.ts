@@ -80,6 +80,20 @@ export async function handleAgentPriceUpdated(chainId: string, log: EventLog): P
   await insertEvent(chainId, log);
 }
 
+export async function handleAgentDeactivated(chainId: string, log: EventLog): Promise<void> {
+  if (await skipRemoved(log)) return;
+
+  const args = requireArgs(log);
+  await db
+    .update(agents)
+    .set({ active: false, updatedAt: new Date() })
+    .where(
+      and(eq(agents.chainId, chainId), eq(agents.onchainId, asBigInt(args.agentId, 'agentId'))),
+    );
+
+  await insertEvent(chainId, log);
+}
+
 export async function handleEscrowCreated(chainId: string, log: EventLog): Promise<void> {
   if (await skipRemoved(log)) return;
 

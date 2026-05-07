@@ -6,6 +6,7 @@ library Events {
         uint256 indexed agentId, address indexed deployer, address tba, string metadataURI
     );
     event AgentPriceUpdated(uint256 indexed agentId, uint256 oldPrice, uint256 newPrice);
+    event AgentDeactivated(uint256 indexed agentId);
     event EscrowCreated(
         uint256 indexed escrowId,
         uint256 indexed agentId,
