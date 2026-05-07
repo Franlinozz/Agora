@@ -2,9 +2,9 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useChainId, useWalletClient } from 'wagmi';
-import { parseUnits } from 'viem';
-import { AgoraClient, getChainOrThrow } from '@agora/sdk';
+import { useAccount, useChainId, useWalletClient } from 'wagmi';
+import { createWalletClient, custom, parseUnits, type Address, type WalletClient } from 'viem';
+import { AgoraClient, getChainOrThrow, toViemChain } from '@agora/sdk';
 
 import { Button, toast } from '@agora/ui';
 
@@ -13,6 +13,7 @@ import type { DeployFormData } from './Wizard';
 export function DeploySubmitButton({ data, capabilities }: { data: DeployFormData; capabilities: Array<{ id: string; name: string; description: string; inputSchema: Record<string, unknown>; outputSchema: Record<string, unknown> }> }) {
   const router = useRouter();
   const connectedChainId = useChainId();
+  const { address, isConnected } = useAccount();
   const { data: walletClient } = useWalletClient();
   const [status, setStatus] = useState<'idle' | 'building' | 'pending' | 'confirmed' | 'error'>('idle');
   const [txHash, setTxHash] = useState('');
@@ -20,15 +21,11 @@ export function DeploySubmitButton({ data, capabilities }: { data: DeployFormDat
   const [errorMessage, setErrorMessage] = useState('');
 
   async function deploy() {
-    if (!walletClient?.account) {
-      toast.error('Connect wallet before deploying.');
-      return;
-    }
-
     setErrorMessage('');
     setStatus('building');
     try {
       const chain = getChainOrThrow(data.chainId);
+      const signer = await resolveWalletClient({ walletClient, address, isConnected, chain });
       if (connectedChainId !== data.chainId) {
         throw new Error(`Switch your wallet to ${chain.displayName} before deploying.`);
       }
@@ -36,7 +33,7 @@ export function DeploySubmitButton({ data, capabilities }: { data: DeployFormDat
         throw new Error(`${chain.displayName} deployments are not live yet because NEXT_PUBLIC_${chain.displayName.toUpperCase()}_AGENT_REGISTRY is not configured in Vercel.`);
       }
 
-      const client = new AgoraClient({ defaultChainId: data.chainId, account: walletClient.account, walletClient });
+      const client = new AgoraClient({ defaultChainId: data.chainId, walletClient: signer });
       setStatus('pending');
       const result = await client.deployAgent({
         name: data.name,
@@ -67,4 +64,40 @@ export function DeploySubmitButton({ data, capabilities }: { data: DeployFormDat
       <Button onClick={deploy} loading={status === 'building' || status === 'pending'}>{status === 'pending' ? 'Waiting for wallet…' : status === 'confirmed' ? 'Confirmed' : 'Deploy agent'}</Button>
     </div>
   );
+}
+
+type EthereumProvider = {
+  request: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
+};
+
+declare global {
+  interface Window {
+    ethereum?: EthereumProvider;
+  }
+}
+
+async function resolveWalletClient({
+  walletClient,
+  address,
+  isConnected,
+  chain,
+}: {
+  walletClient?: WalletClient | null;
+  address?: Address;
+  isConnected: boolean;
+  chain: ReturnType<typeof getChainOrThrow>;
+}): Promise<WalletClient> {
+  if (walletClient?.account) return walletClient;
+
+  const provider = typeof window !== 'undefined' ? window.ethereum : undefined;
+  if (!provider || !isConnected || !address) {
+    throw new Error('Connect wallet before deploying. Open Agora inside Base App, then use Base App / Coinbase Wallet or Injected from the wallet popup.');
+  }
+
+  await provider.request({ method: 'eth_requestAccounts' });
+  return createWalletClient({
+    account: address,
+    chain: toViemChain(chain),
+    transport: custom(provider),
+  });
 }
