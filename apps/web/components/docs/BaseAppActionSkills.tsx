@@ -146,7 +146,7 @@ export function BaseAppActionSkills() {
   return (
     <div className="not-prose mt-8 grid gap-5">
       <div className="rounded-2xl border border-[var(--color-arc-purple)]/30 bg-[var(--color-arc-purple)]/10 p-5">
-        <p className="font-mono text-xs uppercase tracking-[0.22em] text-[var(--color-arc-purple-light)]">// Interactive Base App actions</p>
+        <p className="font-mono text-xs uppercase tracking-[0.22em] text-[var(--color-arc-purple-light)]">{'// Interactive Base App actions'}</p>
         <h2 className="mt-2 text-2xl font-semibold text-[var(--color-text-primary)]">Useful queries that end in real Base transactions.</h2>
         <p className="mt-2 text-sm leading-6 text-[var(--color-text-secondary)]">
           These are zero-value onchain receipts, not agent deployments. Query something useful, then sign a Base transaction with Agora Builder Code attribution. You still pay normal Base gas.
