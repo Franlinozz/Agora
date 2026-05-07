@@ -1,7 +1,7 @@
 
 import { getChainOrThrow } from '@agora/chains';
-import { ChainNotSupportedError, EscrowState, type Escrow } from '@agora/shared';
-import { erc20Abi, type Account, type Address, type Hash, type Hex, type WalletClient } from 'viem';
+import { ChainNotSupportedError, EscrowState, InsufficientBalanceError, type Escrow } from '@agora/shared';
+import { erc20Abi, formatUnits, type Account, type Address, type Hash, type Hex, type WalletClient } from 'viem';
 
 import { escrowManagerAbi } from '../abis/index.ts';
 import { builderCodeDataSuffix, shouldAttributeChain, writeAttributedContract } from '../attribution.ts';
@@ -50,19 +50,38 @@ export async function createEscrow(
   const spender = escrowAddress(chainId);
   let approvalTxHash: Hash | undefined;
 
-  const allowance = (await client.readContract({
-    address: usdcAddress(chainId),
-    abi: erc20Abi,
-    functionName: 'allowance',
-    args: [(wallet.account ?? (account as Account)).address, spender],
-  })) as bigint;
+  const owner = (wallet.account ?? (account as Account)).address;
+  const token = usdcAddress(chainId);
+  const [allowance, balance] = (await Promise.all([
+    client.readContract({
+      address: token,
+      abi: erc20Abi,
+      functionName: 'allowance',
+      args: [owner, spender],
+    }),
+    client.readContract({
+      address: token,
+      abi: erc20Abi,
+      functionName: 'balanceOf',
+      args: [owner],
+    }),
+  ])) as [bigint, bigint];
+
+  if (balance < params.amountUsdc) {
+    throw new InsufficientBalanceError(
+      `Insufficient USDC balance. You need ${formatUnits(params.amountUsdc, 6)} USDC, but this wallet only has ${formatUnits(
+        balance,
+        6,
+      )} USDC on ${getChainOrThrow(chainId).displayName}.`,
+    );
+  }
 
   if (allowance < params.amountUsdc) {
     approvalTxHash = await writeAttributedContract({
       chainId,
       wallet,
       account: wallet.account ?? (account as Account),
-      address: usdcAddress(chainId),
+      address: token,
       abi: erc20Abi,
       functionName: 'approve',
       args: [spender, params.amountUsdc],
